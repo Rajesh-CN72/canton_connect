@@ -1,0 +1,36 @@
+﻿COMMON FIXES FOR HOMESCREEN IMAGE ISSUES:
+
+1. ✅ CORRECT PATHS (confirmed working):
+   'assets/images/categories/chinese_category.jpg'
+   'assets/images/categories/fusion_category.jpg' 
+   'assets/images/categories/indian_category.jpg'
+
+2. ✅ PROPER IMAGE WIDGET:
+   Container(
+     width: 200,  // MUST have explicit size
+     height: 100, // MUST have explicit size  
+     child: Image.asset(
+       'assets/images/categories/chinese_category.jpg',
+       fit: BoxFit.cover,
+     ),
+   )
+
+3. ✅ WITH ERROR HANDLING:
+   Image.asset(
+     'assets/images/categories/chinese_category.jpg',
+     width: 200,
+     height: 100,
+     fit: BoxFit.cover,
+     errorBuilder: (context, error, stackTrace) {
+       return Container(
+         color: Colors.grey[200],
+         child: Icon(Icons.error),
+       );
+     },
+   )
+
+4. ✅ CHECK VISIBILITY:
+   - Ensure parent Container has explicit size
+   - Ensure Image is not behind other widgets
+   - Check if images are in ScrollView that's not scrolling
+   - Verify state management is updating correctly

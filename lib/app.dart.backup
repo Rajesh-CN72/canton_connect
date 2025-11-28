@@ -1,0 +1,76 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+
+import 'presentation/providers/language_provider.dart';
+import 'presentation/screens/home_screen.dart';
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => LanguageProvider(),
+      child: Builder(
+        builder: (context) {
+          // final languageProvider = Provider.of<LanguageProvider>(context); // Temporarily commented
+          
+          return MaterialApp(
+            title: 'Canton Connect',
+            theme: ThemeData(
+              fontFamily: 'Poppins',
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              textTheme: const TextTheme(
+                displayLarge: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 24,
+                ),
+                displayMedium: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600, 
+                  fontSize: 20,
+                ),
+                bodyLarge: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                ),
+                bodyMedium: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            darkTheme: ThemeData(
+              fontFamily: 'Poppins',
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blue,
+                brightness: Brightness.dark,
+              ),
+            ),
+            themeMode: ThemeMode.system,
+            // // locale: languageProvider.currentLocale, // Temporarily disabled // Temporarily commented out
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', 'US'),
+              Locale('zh', 'CN'),
+            ],
+            home: const HomeScreen(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
+

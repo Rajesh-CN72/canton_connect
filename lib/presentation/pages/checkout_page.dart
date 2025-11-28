@@ -1,0 +1,19 @@
+// lib/presentation/pages/checkout_page.dart
+
+import 'package:flutter/material.dart';
+
+class CheckoutPage extends StatelessWidget {
+  const CheckoutPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Checkout'),
+      ),
+      body: const Center(
+        child: Text('Checkout Page - Coming Soon'),
+      ),
+    );
+  }
+}

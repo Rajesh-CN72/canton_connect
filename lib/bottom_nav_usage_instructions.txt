@@ -1,0 +1,39 @@
+﻿HOW TO USE SMART BOTTOM NAVIGATION IN HOMESCREEN:
+
+1. ADD STATE MANAGEMENT FOR CURRENT INDEX:
+int _currentBottomNavIndex = 0;
+
+2. ADD BOTTOM NAVIGATION TO YOUR SCAFFOLD:
+Scaffold(
+  appBar: CustomAppBar(...),
+  body: _getCurrentPage(_currentBottomNavIndex),
+  bottomNavigationBar: SmartBottomNavigation(
+    currentIndex: _currentBottomNavIndex,
+    onTap: (index) {
+      setState(() {
+        _currentBottomNavIndex = index;
+      });
+    },
+  ),
+)
+
+3. CREATE PAGE SWITCHER METHOD:
+Widget _getCurrentPage(int index) {
+  switch (index) {
+    case 0:
+      return HomePage(); // Your home content
+    case 1:
+      return CuisinesPage();
+    case 2:
+      return CookAtHomePage();
+    case 3:
+      return CartPage();
+    case 4:
+      return ProfilePage();
+    default:
+      return HomePage();
+  }
+}
+
+4. MAKE SURE TO IMPORT:
+import '../widgets/common/smart_bottom_navigation.dart';
