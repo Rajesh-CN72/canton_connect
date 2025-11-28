@@ -1,4 +1,4 @@
-# food_deliver
+# canton_connect
 
 A new Flutter project.
 
