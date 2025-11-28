@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- Base href for Flutter web deployment -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  
+  <!-- SEO Meta Tags for Chinese Market -->
+  <meta name="description" content="广州美食配送 - 新鲜食材订阅服务，每日餐食配送。健康美味，根据您的口味定制。Guangzhou fresh food subscription with daily meal deliveries.">
+  <meta name="keywords" content="广州美食, 外卖配送, 新鲜食材, 健康餐食, 订阅服务, 广州外卖, Guangzhou food, food subscription, meal delivery, Chinese cuisine, 广州中餐">
+  <meta name="author" content="广州美食配送">
+  
+  <!-- iOS PWA Meta Tags & Icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="广州美食配送">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  
+  <!-- Android/Generic PWA Meta Tags -->
+  <meta name="theme-color" content="#DC143C">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Viewport for responsive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="main.dart.js" as="script">
+  
+  <!-- Social Media Meta Tags for Chinese Platforms -->
+  <meta property="og:title" content="广州美食配送 - 新鲜食材订阅服务">
+  <meta property="og:description" content="每日新鲜餐食配送到府。立即订阅！Fresh, healthy meals delivered to your door in Guangzhou.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="icons/Icon-512.png">
+  <meta property="og:locale" content="zh_CN">
+  
+  <!-- WeChat/QQ Meta Tags -->
+  <meta itemprop="name" content="广州美食配送">
+  <meta itemprop="description" content="广州本地新鲜美食配送服务">
+  <meta itemprop="image" content="icons/Icon-512.png">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="广州美食配送 - Guangzhou Food Delivery">
+  <meta name="twitter:description" content="广州本地新鲜美食配送服务 - Local Guangzhou food delivery">
+  <meta name="twitter:image" content="icons/Icon-512.png">
+  
+  <!-- Chinese Baidu SEO -->
+  <meta name="baidu-site-verification" content="your-baidu-verification-code">
+  
+  <!-- Mobile Specific -->
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#DC143C">
+  
+  <title>广州美食配送 - Guangzhou Food Delivery Service</title>
+  
+  <!-- Flutter Web Configuration - UPDATED for Flutter 3.19+ -->
+  <script>
+    // Enhanced Flutter Web initialization for Guangzhou app
+    window.addEventListener('load', function(ev) {
+      // Performance monitoring for Chinese networks
+      const loadStartTime = Date.now();
+      
+      // Flutter configuration for better performance in China
+      _flutter = {
+        loader: {
+          didCreateEngineInitializer: (engineInitializer) => {
+            const config = {
+              renderer: "html", // Better compatibility in China
+              fontFallback: false, // Disable automatic font loading
+              // Optimize for mobile networks
+              assetBase: "/assets/",
+              // Enable canvas rendering fallback
+              useCanvasKit: false
+            };
+            
+            engineInitializer.initializeEngine(config).then((appRunner) => {
+              const loadTime = Date.now() - loadStartTime;
+              console.log(`Flutter app loaded in ${loadTime}ms`);
+              appRunner.runApp();
+            }).catch(error => {
+              console.error('Flutter engine initialization failed:', error);
+              // Fallback: hide loading screen
+              const loading = document.getElementById('loading');
+              if (loading) {
+                loading.style.display = 'none';
+              }
+            });
+          }
+        }
+      };
+
+      // Enhanced Service Worker for offline functionality
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('flutter_service_worker.js?v=' + Date.now())
+          .then(function(registration) {
+            console.log('ServiceWorker registered successfully for offline access');
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              console.log('New service worker version found');
+            });
+          })
+          .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      }
+      
+      // Update theme color dynamically
+      const metaThemeColor = document.querySelector("meta[name=theme-color]");
+      if (metaThemeColor) {
+        // Set theme color to Chinese red
+        metaThemeColor.setAttribute("content", "#DC143C");
+      }
+      
+      // Chinese browser compatibility
+      if (navigator.userAgent.indexOf('MicroMessenger') !== -1) {
+        // WeChat browser specific fixes
+        document.documentElement.style.webkitTouchCallout = 'none';
+      }
+    });
+
+    // Fallback for older Flutter versions
+    if (typeof _flutter === 'undefined') {
+      window._flutter = {};
+    }
+    window._flutter.renderer = "html";
+    
+    // Error handling for Chinese browsers
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.error);
+    });
+  </script>
+  
+  <style>
+    /* Prevent flash of unstyled content */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #DC143C;
+      overflow: hidden;
+    }
+    
+    /* Loading animation styles */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .pulse {
+      animation: pulse 1.5s ease-in-out infinite alternate;
+    }
+    
+    @keyframes pulse {
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Flutter app container -->
+  <script src="flutter_bootstrap.js" async></script>
+  
+  <!-- Enhanced Bilingual Loading Screen for Guangzhou -->
+  <div id="loading" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #DC143C 0%, #B22222 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+    animation: fadeIn 0.5s ease;
+  ">
+    <div style="text-align: center; padding: 20px;">
+      <!-- App Logo/Icon -->
+      <div style="
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 20px;
+        margin: 0 auto 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: pulse 2s infinite;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      ">
+        <div style="
+          width: 60px;
+          height: 60px;
+          background: #DC143C;
+          border-radius: 12px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          font-weight: bold;
+          font-size: 24px;
+        ">广</div>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div style="
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 25px;
+      "></div>
+      
+      <!-- Bilingual Text -->
+      <h2 style="
+        margin: 0 0 12px 0; 
+        font-size: 28px; 
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      ">广州美食配送</h2>
+      <h3 style="
+        margin: 0 0 20px 0; 
+        font-size: 18px; 
+        font-weight: 400;
+        opacity: 0.9;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      ">Guangzhou Food Delivery</h3>
+      
+      <p style="
+        margin: 0 0 8px 0; 
+        opacity: 0.8; 
+        font-size: 16px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      ">正在加载美味餐食...</p>
+      <p style="
+        margin: 0; 
+        opacity: 0.7; 
+        font-size: 14px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      ">Loading delicious meals...</p>
+      
+      <!-- Progress indicator -->
+      <div style="
+        width: 120px;
+        height: 4px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        margin: 20px auto 0;
+        overflow: hidden;
+      ">
+        <div id="progress-bar" style="
+          width: 30%;
+          height: 100%;
+          background: white;
+          border-radius: 2px;
+          transition: width 0.3s ease;
+          animation: progressAnimation 2s infinite;
+        "></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced loading screen management for Guangzhou app
+    let appLoaded = false;
+    let progressInterval;
+    
+    // Simulate progress for better UX
+    function startProgressAnimation() {
+      const progressBar = document.getElementById('progress-bar');
+      if (!progressBar) return;
+      
+      let progress = 30;
+      progressInterval = setInterval(() => {
+        if (progress < 80) {
+          progress += Math.random() * 10;
+          progressBar.style.width = Math.min(progress, 80) + '%';
+        }
+      }, 500);
+    }
+    
+    // Hide loading screen when Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      appLoaded = true;
+      clearInterval(progressInterval);
+      
+      const loading = document.getElementById('loading');
+      const progressBar = document.getElementById('progress-bar');
+      
+      if (progressBar) {
+        progressBar.style.width = '100%';
+      }
+      
+      if (loading) {
+        setTimeout(() => {
+          loading.style.opacity = '0';
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }, 300);
+      }
+    });
+    
+    // Start progress animation when page loads
+    window.addEventListener('load', function() {
+      startProgressAnimation();
+    });
+    
+    // Fallback: hide loading after 8 seconds max
+    setTimeout(function() {
+      if (!appLoaded) {
+        console.warn('Fallback: Hiding loading screen after timeout');
+        const loading = document.getElementById('loading');
+        const progressBar = document.getElementById('progress-bar');
+        
+        if (progressBar) {
+          progressBar.style.width = '100%';
+        }
+        
+        if (loading) {
+          loading.style.opacity = '0';
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }
+        
+        clearInterval(progressInterval);
+      }
+    }, 8000);
+    
+    // Chinese browser detection and optimization
+    if (navigator.userAgent.indexOf('MicroMessenger') !== -1) {
+      // WeChat browser optimizations
+      document.addEventListener('WeixinJSBridgeReady', function() {
+        console.log('WeChat JS Bridge ready');
+      });
+    }
+  </script>
+  
+  <style>
+    @keyframes progressAnimation {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</body>
+</html>
