@@ -1,59 +1,50 @@
 name: canton_connect
-description: Canton Connect Food App
-publish_to: "none"
+description: Canton Connect - Food Delivery App
+publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  # Add these dependencies
-  flutter_hooks: ^0.20.0
-  hooks_riverpod: ^2.4.0
-  go_router: ^12.1.3
-  # UI & State Management
+
+  # Core UI & State Management
+  cupertino_icons: ^1.0.2
   provider: ^6.1.1
   
-  equatable: ^2.0.7
+  # Navigation
+  go_router: ^12.1.3
+  
+  # Storage & Networking
+  shared_preferences: ^2.2.2
   http: ^1.1.0
+  
+  # Navigation & UI
+  url_launcher: ^6.1.11
+  image: ^4.0.17
+
   # Localization
   flutter_localizations:
     sdk: flutter
-  intl: ^0.20.2 
-  
-  # Storage & Persistence
-  shared_preferences: ^2.2.2
-  
-  # Image Handling
-  image_picker: ^1.0.4
+  intl: ^0.20.2
 
-  # Supabase & Environment
-  supabase_flutter: ^1.10.25
-  flutter_dotenv: ^5.1.0
+  # Utilities
+  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
-
-dependency_overrides:
-  objective_c: ^9.2.0
-  hooks: ^0.20.5
-  code_assets: ^0.19.10
-
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
-  
+
   assets:
-    # Directories (use directory notation to include all files in folder)
     - assets/images/
     - assets/translations/
-    
-    # Or if you want to specify individual files, remove the directory entries above
-    # and use the detailed list below:
     - assets/images/food_placeholder.png
     - assets/images/food_placeholder_2.png
     - assets/images/food_placeholder_3.png
@@ -61,8 +52,6 @@ flutter:
     - assets/images/drinks/lemon_tea.png
     - assets/images/drinks/coconut.png
     - assets/images/drinks/drink_placeholder.png
-    
-    # Food images
     - assets/images/foods/appetizers/spring_rolls.jpg        
     - assets/images/foods/appetizers/pork_dumplings.jpg   
     - assets/images/foods/seafood/steamed_fish.jpg   
@@ -79,30 +68,20 @@ flutter:
     - assets/images/foods/desserts/mango_pudding.jpg       
     - assets/images/foods/desserts/sesame_balls.jpg   
     - assets/images/foods/drinks/bubble_tea.jpg          
-    
-    # Addons
     - assets/images/addons/extra_rice.jpg              
     - assets/images/addons/extra_sauce.jpg 
-    
-    # Hero images
     - assets/images/hero/hero_dish.png
     - assets/images/hero/hero_dish_mobile.png
     - assets/images/hero/hero_dish2.png
     - assets/images/hero/hero_couple.png
-    
-    # Background images
     - assets/images/background/home_background.jpg
     - assets/images/background/app_background.jpg
     - assets/images/background/background.jpg
     - assets/images/background/cta_background.jpg
     - assets/images/background/back_ground_1.jpg
-    
-    # Signature dishes
     - assets/images/signature/fish.jpg                    
     - assets/images/signature/pork.jpg                    
     - assets/images/signature/duck.jpg                    
-    
-    # Menu items
     - assets/images/menu/kung_pao_chicken.jpg        
     - assets/images/menu/sweet_sour_pork.jpg         
     - assets/images/menu/mapo_tofu.jpg               
@@ -115,38 +94,24 @@ flutter:
     - assets/images/menu/vegetable_stir_fry.jpg
     - assets/images/menu/fried_rice.jpg              
     - assets/images/menu/spring_rolls.jpg  
-    
-    # Youth favorites
     - assets/images/youth/chicken.jpg                 
     - assets/images/youth/shrimp.jpg      
-    
-    # Healthy options
     - assets/images/healthy/fish.jpg                    
     - assets/images/healthy/vegetables.jpg 
-    
-    # Desserts
     - assets/images/desserts/mango.jpg                   
     - assets/images/desserts/eggtart.jpg                 
     - assets/images/desserts/redbean.jpg 
-    
-    # Family packages
     - assets/images/family/combo_a.jpg                 
     - assets/images/family/combo_b.jpg                 
-    
-    # Translations
-    - assets/translations/zh.json
-    - assets/translations/en.json
-    
-    # Icons
     - assets/images/icons/icon-192.png                
     - assets/images/icons/icon-512.png                
-    
-    # Individual important files
     - assets/images/pattern.png
     - assets/images/logo_white.png
     - assets/images/logo.png
     - assets/images/favicon.png
     - assets/images/default_avatar.png 
+    - assets/translations/zh.json
+    - assets/translations/en.json
 
   fonts:
     - family: Poppins
@@ -165,7 +130,6 @@ flutter:
           weight: 500
         - asset: assets/fonts/NotoSansSC-Bold.ttf
           weight: 700
-        # Add fallback font for missing characters
     - family: Fallback
       fonts:
         - asset: assets/fonts/NotoSansSC-Regular.ttf

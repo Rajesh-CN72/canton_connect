@@ -1,18 +1,18 @@
 // D:\FlutterProjects\Home_Cook\canton_connect\lib\data\services\notification_service.dart
 
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
+import 'dart:async';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final BehaviorSubject<String?> _onNotification = BehaviorSubject();
+  final StreamController<String?> _onNotification = StreamController<String?>.broadcast();
   Stream<String?> get onNotification => _onNotification.stream;
 
   // For showing in-app notifications (SnackBar, Dialog, etc.)
-  final BehaviorSubject<InAppNotification> _inAppNotifications = BehaviorSubject();
+  final StreamController<InAppNotification> _inAppNotifications = StreamController<InAppNotification>.broadcast();
   Stream<InAppNotification> get inAppNotifications => _inAppNotifications.stream;
 
   // Simple notification methods that don't require the local notifications package
@@ -87,6 +87,57 @@ class NotificationService {
         SnackBar(
           content: Text(message),
           backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void showSuccessNotification(String message, BuildContext? context) {
+    _inAppNotifications.add(InAppNotification(
+      title: 'Success',
+      message: message,
+      type: NotificationType.success,
+    ));
+
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  void showInfoNotification(String message, BuildContext? context) {
+    _inAppNotifications.add(InAppNotification(
+      title: 'Information',
+      message: message,
+      type: NotificationType.info,
+    ));
+
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.blue,
+        ),
+      );
+    }
+  }
+
+  void showWarningNotification(String message, BuildContext? context) {
+    _inAppNotifications.add(InAppNotification(
+      title: 'Warning',
+      message: message,
+      type: NotificationType.warning,
+    ));
+
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.orange,
         ),
       );
     }
@@ -168,5 +219,33 @@ class InAppNotification {
       case NotificationType.info:
         return Icons.info;
     }
+  }
+
+  @override
+  String toString() {
+    return 'InAppNotification{title: $title, message: $message, type: $type, timestamp: $timestamp}';
+  }
+}
+
+// Helper extension for easy notification display
+extension NotificationExtension on BuildContext {
+  void showSuccessNotification(String message) {
+    NotificationService().showSuccessNotification(message, this);
+  }
+
+  void showErrorNotification(String message) {
+    NotificationService().showErrorNotification(message, this);
+  }
+
+  void showInfoNotification(String message) {
+    NotificationService().showInfoNotification(message, this);
+  }
+
+  void showWarningNotification(String message) {
+    NotificationService().showWarningNotification(message, this);
+  }
+
+  void showOrderStatusNotification(String status, String orderId) {
+    NotificationService().showOrderStatusNotification(status, orderId, this);
   }
 }

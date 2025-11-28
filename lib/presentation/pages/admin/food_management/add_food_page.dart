@@ -1,6 +1,7 @@
+// lib/presentation/pages/admin/food_management/add_food_page.dart
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:canton_connect/data/services/api_service.dart';
 
 class AddFoodPage extends StatefulWidget {
   const AddFoodPage({Key? key}) : super(key: key);
@@ -10,174 +11,82 @@ class AddFoodPage extends StatefulWidget {
 }
 
 class _AddFoodPageState extends State<AddFoodPage> {
-  final _formKey = GlobalKey<FormState>();
-  final ImagePicker _imagePicker = ImagePicker();
-  
-  // Form controllers
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _prepTimeController = TextEditingController();
-  final _caloriesController = TextEditingController();
-  
-  // Form values
-  String _selectedCategory = 'Main Course';
-  final List<String> _selectedTags = [];
-  bool _isVegetarian = false;
-  bool _isVegan = false;
-  bool _isSpicy = false;
-  bool _isAvailable = true;
-  bool _isFeatured = false; // ADDED: Featured field
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+
   bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
+  String _selectedCategory = '2'; // Default to Main Course
+  String _selectedSubcategory = '1'; // Default to first subcategory
+  bool _isAvailable = true;
+  bool _isVegetarian = false;
+  bool _isSpicy = false;
 
-  // Image picker
-  XFile? _selectedImage;
-  File? _imageFile;
-
-  // Available categories and tags - MARKED AS USED
-  final List<String> _categories = [
-    'Main Course',
-    'Appetizers',
-    'Desserts',
-    'Beverages',
-    'Salads',
-    'Soups',
-    'Specials',
-    'Family Packages',
-    'Signature Dishes',
-    'Youth Favorites',
-    'Healthy Options',
-  ];
-
-  final List<String> _availableTags = [
-    'Popular',
-    'Chef Special',
-    'Healthy',
-    'Gluten Free',
-    'Dairy Free',
-    'Low Carb',
-    'High Protein'
-  ];
+  // Mock categories and subcategories
+  final Map<String, List<String>> _categories = {
+    '1': ['vegetarian', 'meat', 'seafood'], // Appetizers
+    '2': ['chicken', 'beef', 'pork', 'seafood', 'tofu', 'duck'], // Main Course
+    '3': ['pudding', 'cake', 'ice_cream'], // Desserts
+    '4': ['tea', 'juice', 'soda', 'alcoholic'], // Drinks
+  };
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
-    _prepTimeController.dispose();
-    _caloriesController.dispose();
     super.dispose();
   }
 
-  // Image Picker Methods - FIXED: Removed unused _showImageSourceDialog
-  Future<void> _pickImageFromGallery() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-          _imageFile = File(image.path);
-        });
-      }
-    } catch (e) {
-      _showError('Failed to pick image: $e');
-    }
-  }
-
-  Future<void> _takePhotoWithCamera() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-          _imageFile = File(image.path);
-        });
-      }
-    } catch (e) {
-      _showError('Failed to take photo: $e');
-    }
-  }
-
-  void _removeImage() {
-    setState(() {
-      _selectedImage = null;
-      _imageFile = null;
-    });
-  }
-
-  // FIXED: Removed unused _showImageSourceDialog method
-
-  // FIXED: _toggleTag is now used in tags section
-  void _toggleTag(String tag) {
-    setState(() {
-      if (_selectedTags.contains(tag)) {
-        _selectedTags.remove(tag);
-      } else {
-        _selectedTags.add(tag);
-      }
-    });
-  }
-
-  // FIXED: _submitForm is now used by submit button
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      _showError('Please fill all required fields correctly');
-      return;
-    }
-
-    // Optional: Require image
-    if (_selectedImage == null) {
-      final shouldContinue = await _showImageRequiredDialog();
-      if (!shouldContinue) {
-        return;
-      }
-    }
+  Future<void> _addFoodItem() async {
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
+      _errorMessage = null;
+      _successMessage = null;
     });
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Create food data
-      final foodData = {
+      // Create food item data directly without storing in unused variable
+      await ApiService().addFoodItem({
         'name': _nameController.text.trim(),
+        'name_en': _nameController.text.trim(), // For consistency
         'description': _descriptionController.text.trim(),
+        'description_en': _descriptionController.text.trim(), // For consistency
         'price': double.parse(_priceController.text),
-        'category': _selectedCategory,
-        'prepTime': int.parse(_prepTimeController.text),
-        'calories': _caloriesController.text.isNotEmpty ? int.parse(_caloriesController.text) : null,
-        'tags': _selectedTags,
-        'isVegetarian': _isVegetarian,
-        'isVegan': _isVegan,
-        'isSpicy': _isSpicy,
-        'isAvailable': _isAvailable,
-        'isFeatured': _isFeatured, // ADDED: Featured field
-        'imagePath': _selectedImage?.path,
-      };
+        'category_id': _selectedCategory,
+        'subcategory_id': _selectedSubcategory,
+        'is_available': _isAvailable,
+        'is_vegetarian': _isVegetarian,
+        'is_spicy': _isSpicy,
+        'image_url': _getDefaultImageUrl(),
+        'is_popular': false,
+        'cooking_time': 15,
+        'spice_level': _isSpicy ? 2 : 0,
+        'rating': 0.0,
+        'review_count': 0,
+        'sort_order': 1,
+        'created_at': DateTime.now().toIso8601String(),
+      });
 
-      print('Food item created: $foodData');
-      print('Image path: ${_selectedImage?.path}');
-      
-      _showSuccess('Food item added successfully!');
-      _resetForm();
+      setState(() {
+        _successMessage = '食品添加成功！';
+      });
+
+      // Clear form on success
+      _formKey.currentState!.reset();
+      _nameController.clear();
+      _descriptionController.clear();
+      _priceController.clear();
       
     } catch (e) {
-      _showError('Failed to add food item: $e');
+      setState(() {
+        _errorMessage = '添加食品失败: $e';
+      });
     } finally {
       if (mounted) {
         setState(() {
@@ -187,846 +96,384 @@ class _AddFoodPageState extends State<AddFoodPage> {
     }
   }
 
-  Future<bool> _showImageRequiredDialog() async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('No Image Selected'),
-          content: const Text('Would you like to continue without an image?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Add Image'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Continue Anyway'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
+  String _getDefaultImageUrl() {
+    // Return a default image based on category
+    switch (_selectedCategory) {
+      case '1': // Appetizers
+        return 'assets/images/menu/spring_rolls.jpg';
+      case '2': // Main Course
+        return 'assets/images/menu/kung_pao_chicken.jpg';
+      case '3': // Desserts
+        return 'assets/images/menu/mango_pudding.jpg';
+      case '4': // Drinks
+        return 'assets/images/menu/bubble_tea.jpg';
+      default:
+        return 'assets/images/food_placeholder.png';
+    }
   }
 
-  void _resetForm() {
+  void _clearForm() {
     _formKey.currentState!.reset();
     _nameController.clear();
     _descriptionController.clear();
     _priceController.clear();
-    _prepTimeController.clear();
-    _caloriesController.clear();
     setState(() {
-      _selectedCategory = 'Main Course';
-      _selectedTags.clear();
-      _isVegetarian = false;
-      _isVegan = false;
-      _isSpicy = false;
+      _selectedCategory = '2';
+      _selectedSubcategory = '1';
       _isAvailable = true;
-      _isFeatured = false; // ADDED: Reset featured field
-      _selectedImage = null;
-      _imageFile = null;
+      _isVegetarian = false;
+      _isSpicy = false;
+      _errorMessage = null;
+      _successMessage = null;
     });
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFFE74C3C),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF27AE60),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Add Food Item'),
-        backgroundColor: const Color(0xFF27AE60),
+        title: const Text('添加新食品'),
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
-        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.clear_all),
-            onPressed: _resetForm,
-            tooltip: 'Clear Form',
+            icon: const Icon(Icons.clear),
+            onPressed: _clearForm,
+            tooltip: '清除表单',
           ),
         ],
       ),
-      body: _isLoading
-          ? _buildLoadingState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Image Upload Section
-                    _buildImageUploadSection(),
-                    const SizedBox(height: 24),
-                    
-                    // Basic Information Section
-                    _buildBasicInfoSection(),
-                    const SizedBox(height: 24),
-                    
-                    // Category & Dietary Section
-                    _buildCategoryDietarySection(),
-                    const SizedBox(height: 24),
-                    
-                    // Tags Section
-                    _buildTagsSection(),
-                    const SizedBox(height: 24),
-                    
-                    // Featured & Availability Section
-                    _buildFeaturedAvailabilitySection(),
-                    const SizedBox(height: 32),
-                    
-                    // Submit Button
-                    _buildSubmitButton(),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Adding Food Item...',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF2C3E50),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageUploadSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFEAEDF0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Food Image',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 12),
-            _selectedImage != null
-                ? _buildSelectedImage()
-                : const _ImagePlaceholder(),
-            const SizedBox(height: 12),
-            _buildImagePickerButtons(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSelectedImage() {
-    return Column(
-      children: [
-        Stack(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFEAEDF0)),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  _imageFile!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFF8F9FA),
-                      child: const Icon(
-                        Icons.error_outline,
-                        size: 40,
-                        color: Color(0xFFE74C3C),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 20),
-                  onPressed: _removeImage,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _selectedImage!.name,
-          style: const TextStyle(
-            color: Color(0xFF566573),
-            fontSize: 12,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildImagePickerButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: _pickImageFromGallery,
-            icon: const Icon(Icons.photo_library, size: 20),
-            label: const Text('Gallery'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2C3E50),
-              side: const BorderSide(color: Color(0xFFEAEDF0)),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: _takePhotoWithCamera,
-            icon: const Icon(Icons.camera_alt, size: 20),
-            label: const Text('Camera'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2C3E50),
-              side: const BorderSide(color: Color(0xFFEAEDF0)),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBasicInfoSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFEAEDF0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Basic Information',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Name Field
-            _buildTextField(
-              controller: _nameController,
-              label: 'Food Name *',
-              hintText: 'Enter food name',
-              prefixIcon: Icons.fastfood,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter food name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            
-            // Description Field
-            _buildTextArea(
-              controller: _descriptionController,
-              label: 'Description *',
-              hintText: 'Describe the food item...',
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter description';
-                }
-                if (value.length < 10) {
-                  return 'Description should be at least 10 characters';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            
-            // Price and Prep Time Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: _priceController,
-                    label: 'Price (\¥) *',
-                    hintText: '0.00',
-                    prefixIcon: Icons.attach_money,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter price';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter valid price';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    controller: _prepTimeController,
-                    label: 'Prep Time (mins) *',
-                    hintText: '30',
-                    prefixIcon: Icons.timer,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter prep time';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return 'Please enter valid time';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            // Calories Field
-            _buildTextField(
-              controller: _caloriesController,
-              label: 'Calories (optional)',
-              hintText: 'Enter calories',
-              prefixIcon: Icons.local_fire_department,
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryDietarySection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFEAEDF0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Category & Dietary',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Category Dropdown
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Category *',
-                  style: TextStyle(
-                    color: Color(0xFF2C3E50),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Success Message
+              if (_successMessage != null)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFEAEDF0)),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green[200]!),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedCategory,
-                      isExpanded: true,
-                      icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF566573)),
-                      items: _categories.map((String category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedCategory = newValue!;
-                        });
-                      },
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _successMessage!,
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            // Dietary Options
-            const Text(
-              'Dietary Information',
-              style: TextStyle(
-                color: Color(0xFF2C3E50),
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: [
-                _buildDietaryChip(
-                  label: 'Vegetarian',
-                  value: _isVegetarian,
-                  onChanged: (value) => setState(() => _isVegetarian = value!),
-                  activeColor: const Color(0xFF27AE60),
-                ),
-                _buildDietaryChip(
-                  label: 'Vegan',
-                  value: _isVegan,
-                  onChanged: (value) => setState(() => _isVegan = value!),
-                  activeColor: const Color(0xFF229954),
-                ),
-                _buildDietaryChip(
-                  label: 'Spicy',
-                  value: _isSpicy,
-                  onChanged: (value) => setState(() => _isSpicy = value!),
-                  activeColor: const Color(0xFFE74C3C),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildTagsSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFEAEDF0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Tags & Labels',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Select relevant tags for your food item',
-              style: TextStyle(
-                color: Color(0xFF566573),
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _availableTags.map((tag) {
-                final isSelected = _selectedTags.contains(tag);
-                return FilterChip(
-                  label: Text(tag),
-                  selected: isSelected,
-                  onSelected: (selected) => _toggleTag(tag), // FIXED: Now using _toggleTag
-                  selectedColor: const Color(0xFFD5F4E2),
-                  checkmarkColor: const Color(0xFF27AE60),
-                  labelStyle: TextStyle(
-                    color: isSelected ? const Color(0xFF27AE60) : const Color(0xFF2C3E50),
-                    fontWeight: FontWeight.w500,
+              // Error Message
+              if (_errorMessage != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red[200]!),
                   ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ADDED: New section for Featured & Availability
-  Widget _buildFeaturedAvailabilitySection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFEAEDF0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Featured Item Toggle
-            Row(
-              children: [
-                const Icon(
-                  Icons.star_outlined,
-                  color: Color(0xFFFFD700),
-                  size: 24,
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red[600], size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: Colors.red[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 12),
-                const Expanded(
+
+              // Food Name
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: '食品名称',
+                  hintText: '输入食品名称',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.fastfood),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入食品名称';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Description
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: '描述',
+                  hintText: '输入食品描述',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.description),
+                ),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入描述';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Price
+              TextFormField(
+                controller: _priceController,
+                decoration: const InputDecoration(
+                  labelText: '价格',
+                  hintText: '输入价格',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.attach_money),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入价格';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return '请输入有效的价格';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Category Dropdown
+              DropdownButtonFormField<String>(
+                initialValue: _selectedCategory, // Fixed: Replaced deprecated 'value' with 'initialValue'
+                decoration: const InputDecoration(
+                  labelText: '分类',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.category),
+                ),
+                items: _categories.keys.map((String category) {
+                  String categoryName = '';
+                  switch (category) {
+                    case '1': categoryName = '开胃菜'; break;
+                    case '2': categoryName = '主菜'; break;
+                    case '3': categoryName = '甜品'; break;
+                    case '4': categoryName = '饮品'; break;
+                  }
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(categoryName),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue!;
+                    _selectedSubcategory = _categories[newValue]!.first;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请选择分类';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Subcategory Dropdown
+              DropdownButtonFormField<String>(
+                initialValue: _selectedSubcategory, // Fixed: Replaced deprecated 'value' with 'initialValue'
+                decoration: const InputDecoration(
+                  labelText: '子分类',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.list),
+                ),
+                items: _categories[_selectedCategory]!.map((String subcategory) {
+                  return DropdownMenuItem<String>(
+                    value: subcategory,
+                    child: Text(subcategory),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedSubcategory = newValue!;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请选择子分类';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Toggle Switches
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Featured Item',
+                      const Text(
+                        '食品属性',
                         style: TextStyle(
-                          color: Color(0xFF2C3E50),
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      Text(
-                        'Show this item in featured section on menu',
+                      const SizedBox(height: 12),
+                      // Available
+                      SwitchListTile(
+                        title: const Text('可供订购'),
+                        value: _isAvailable,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isAvailable = value;
+                          });
+                        },
+                      ),
+                      // Vegetarian
+                      SwitchListTile(
+                        title: const Text('素食'),
+                        value: _isVegetarian,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isVegetarian = value;
+                          });
+                        },
+                      ),
+                      // Spicy
+                      SwitchListTile(
+                        title: const Text('辣味'),
+                        value: _isSpicy,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isSpicy = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Image Preview (using default images)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '图片预览',
                         style: TextStyle(
-                          color: Color(0xFF566573),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey[200],
+                        ),
+                        child: Center(
+                          child: Text(
+                            _getCategoryName(_selectedCategory),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '注意: Web版本使用默认图片。如需实际图片，请实现Web兼容的图片上传功能。',
+                        style: TextStyle(
+                          color: Colors.grey[600],
                           fontSize: 12,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Switch(
-                  value: _isFeatured,
-                  onChanged: (value) => setState(() => _isFeatured = value),
-                  activeThumbColor: const Color(0xFFFFD700),
-                  activeTrackColor: const Color(0xFFFFF176),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Divider(height: 1, color: Color(0xFFEAEDF0)),
-            const SizedBox(height: 16),
-            // Availability Toggle
-            Row(
-              children: [
-                const Icon(
-                  Icons.inventory_2_outlined,
-                  color: Color(0xFF2C3E50),
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Available for Order',
-                        style: TextStyle(
-                          color: Color(0xFF2C3E50),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'Make this item available for customers to order',
-                        style: TextStyle(
-                          color: Color(0xFF566573),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // Add Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _addFoodItem,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
                   ),
-                ),
-                Switch(
-                  value: _isAvailable,
-                  onChanged: (value) => setState(() => _isAvailable = value),
-                  activeThumbColor: const Color(0xFF27AE60),
-                  activeTrackColor: const Color(0xFFA8E6A3),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _submitForm, // FIXED: Now using _submitForm
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF27AE60),
-          foregroundColor: Colors.white,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                ),
-              )
-            : const Text(
-                'Add Food Item',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          '添加食品',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ),
-      ),
-    );
-  }
 
-  // FIXED: _buildTextField is now used in basic info section
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    required IconData prefixIcon,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF2C3E50),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: Icon(prefixIcon, color: const Color(0xFF566573)),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFFEAEDF0)),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFFEAEDF0)),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFF27AE60)),
-            ),
-          ),
-          validator: validator,
-        ),
-      ],
-    );
-  }
-
-  // FIXED: _buildTextArea is now used in basic info section
-  Widget _buildTextArea({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    required int maxLines,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF2C3E50),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          decoration: const InputDecoration(
-            hintText: 'Describe the food item...',
-            alignLabelWithHint: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFFEAEDF0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFFEAEDF0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide(color: Color(0xFF27AE60)),
-            ),
-          ),
-          validator: validator,
-        ),
-      ],
-    );
-  }
-
-  // FIXED: _buildDietaryChip is now used in category dietary section
-  Widget _buildDietaryChip({
-    required String label,
-    required bool value,
-    required ValueChanged<bool?> onChanged,
-    required Color activeColor,
-  }) {
-    Color backgroundColor;
-    // FIXED: Replace .value with .toARGB32()
-    switch (activeColor.toARGB32()) {
-      case 0xFF27AE60: // Green
-        backgroundColor = const Color(0xFFD5F4E2);
-        break;
-      case 0xFF229954: // Dark Green
-        backgroundColor = const Color(0xFFA8E6A3);
-        break;
-      case 0xFFE74C3C: // Red
-        backgroundColor = const Color(0xFFFADBD8);
-        break;
-      default:
-        backgroundColor = const Color(0xFFEAEDF0);
-    }
-
-    // FIXED: Added required label and onSelected parameters
-    return FilterChip(
-      label: Text(label),
-      selected: value,
-      onSelected: onChanged,
-      selectedColor: backgroundColor,
-      checkmarkColor: activeColor,
-      labelStyle: TextStyle(
-        color: value ? activeColor : const Color(0xFF2C3E50),
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-}
-
-class _ImagePlaceholder extends StatelessWidget {
-  const _ImagePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 120,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8F9FA),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFEAEDF0)),
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.fastfood_outlined,
-                size: 40,
-                color: Color(0xFF566573),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Tap buttons below to add image',
-                style: TextStyle(
-                  color: Color(0xFF566573),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Gallery or Camera',
-                style: TextStyle(
-                  color: Color(0xFF566573),
-                  fontSize: 12,
-                ),
-              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
-      ],
+      ),
     );
+  }
+
+  String _getCategoryName(String categoryId) {
+    switch (categoryId) {
+      case '1': return '默认开胃菜图片';
+      case '2': return '默认主菜图片';
+      case '3': return '默认甜品图片';
+      case '4': return '默认饮品图片';
+      default: return '默认食品图片';
+    }
   }
 }

@@ -128,6 +128,33 @@ class AppColors {
   static const Color instagram = Color(0xFFE4405F);
   static const Color wechat = Color(0xFF07C160);
   static const Color weibo = Color(0xFFE6162D);
+
+  // ==============================
+  // HELPER METHODS TO REPLACE DEPRECATED METHODS
+  // ==============================
+  
+  /// Replaces deprecated .withOpacity() method
+  static Color withOpacity(Color color, double opacity) {
+    return color.withAlpha((255 * opacity).round());
+  }
+  
+  /// Replaces deprecated color component accessors (.r, .g, .b)
+  static int getRedComponent(Color color) => (color.red * 255.0).round().clamp(0, 255);
+  static int getGreenComponent(Color color) => (color.green * 255.0).round().clamp(0, 255);
+  static int getBlueComponent(Color color) => (color.blue * 255.0).round().clamp(0, 255);
+  
+  /// Creates a color from RGB values with optional opacity
+  static Color fromRGB(int r, int g, int b, [double opacity = 1.0]) {
+    return Color.fromRGBO(r, g, b, opacity);
+  }
+  
+  /// Creates a color from hex string
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 }
 
 // Extension for easy color access in themes
@@ -141,7 +168,7 @@ extension AppColorsTheme on AppColors {
         200: Color(0xFFA5D6A7),
         300: Color(0xFF81C784),
         400: Color(0xFF66BB6A),
-        500: AppColors.primary,
+        500: Color(0xFF27AE60),
         600: Color(0xFF43A047),
         700: Color(0xFF388E3C),
         800: Color(0xFF2E7D32),
@@ -159,7 +186,7 @@ extension AppColorsTheme on AppColors {
         200: Color(0xFFFFCC80),
         300: Color(0xFFFFB74D),
         400: Color(0xFFFFA726),
-        500: AppColors.secondary,
+        500: Color(0xFFFF6B35),
         600: Color(0xFFFB8C00),
         700: Color(0xFFF57C00),
         800: Color(0xFFEF6C00),
@@ -170,7 +197,6 @@ extension AppColorsTheme on AppColors {
 
   static MaterialColor get accentSwatch {
     return MaterialColor(
-      // ignore: deprecated_member_use
       AppColors.accent.value,
       const <int, Color>{
         50: Color(0xFFECEFF1),
@@ -178,12 +204,41 @@ extension AppColorsTheme on AppColors {
         200: Color(0xFFB0BEC5),
         300: Color(0xFF90A4AE),
         400: Color(0xFF78909C),
-        500: AppColors.accent,
+        500: Color(0xFF2C3E50),
         600: Color(0xFF546E7A),
         700: Color(0xFF455A64),
         800: Color(0xFF37474F),
         900: Color(0xFF263238),
       },
     );
+  }
+}
+
+// Extension methods for easy color manipulation
+extension ColorUtils on Color {
+  /// Replacement for deprecated .withOpacity()
+  Color withCustomOpacity(double opacity) {
+    return withAlpha((255 * opacity).round());
+  }
+  
+  /// Get color components as integers (0-255)
+  int get redComponent => (red * 255.0).round().clamp(0, 255);
+  int get greenComponent => (green * 255.0).round().clamp(0, 255);
+  int get blueComponent => (blue * 255.0).round().clamp(0, 255);
+  
+  /// Darken the color by [amount] (0-1)
+  Color darken([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
+  }
+  
+  /// Lighten the color by [amount] (0-1)
+  Color lighten([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    return hslLight.toColor();
   }
 }

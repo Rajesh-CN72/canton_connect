@@ -1,9 +1,7 @@
 // lib/presentation/pages/customer/auth/forgot_password_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:canton_connect/data/services/api_service.dart';
 import 'package:canton_connect/presentation/widgets/custom_text_field.dart';
 import 'package:canton_connect/presentation/widgets/primary_button.dart';
@@ -11,50 +9,73 @@ import 'package:canton_connect/presentation/widgets/auth_header.dart';
 import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
 
-class ForgotPasswordPage extends HookConsumerWidget {
+class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(GlobalKey<FormState>.new);
-    final emailController = useTextEditingController();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
 
-    final isLoading = useState(false);
-    final errorMessage = useState<String?>(null);
-    final successMessage = useState<String?>(null);
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
 
-    void _resetPassword() async {
-      if (!formKey.currentState!.validate()) return;
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
 
-      isLoading.value = true;
-      errorMessage.value = null;
-      successMessage.value = null;
+  ApiService get _apiService => Provider.of<ApiService>(context, listen: false);
 
-      try {
-        await ApiService.resetPassword(emailController.text.trim());
-        
-        successMessage.value = 'Password reset instructions have been sent to your email.';
-        emailController.clear();
-      } catch (e) {
-        errorMessage.value = _getErrorMessage(e);
-      } finally {
-        isLoading.value = false;
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _resetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _successMessage = null;
+    });
+
+    try {
+      await _apiService.resetPassword(_emailController.text.trim());
+      
+      setState(() {
+        _successMessage = 'Password reset instructions have been sent to your email.';
+      });
+      _emailController.clear();
+    } catch (e) {
+      setState(() {
+        _errorMessage = _getErrorMessage(e);
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
 
-    void _navigateToLogin() {
-      if (!isLoading.value) {
-        context.push(AppRoutes.login);
-      }
+  void _navigateToLogin() {
+    if (!_isLoading) {
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -63,7 +84,7 @@ class ForgotPasswordPage extends HookConsumerWidget {
                 // Back button
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, size: 20),
-                  onPressed: () => context.pop(),
+                  onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -79,7 +100,7 @@ class ForgotPasswordPage extends HookConsumerWidget {
                 const SizedBox(height: 32),
 
                 // Success Message
-                if (successMessage.value != null)
+                if (_successMessage != null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -94,7 +115,7 @@ class ForgotPasswordPage extends HookConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            successMessage.value!,
+                            _successMessage!,
                             style: TextStyle(
                               color: Colors.green[700],
                               fontSize: 14,
@@ -105,11 +126,11 @@ class ForgotPasswordPage extends HookConsumerWidget {
                     ),
                   ),
 
-                if (successMessage.value != null) const SizedBox(height: 16),
+                if (_successMessage != null) const SizedBox(height: 16),
 
                 // Email Field
                 CustomTextField(
-                  controller: emailController,
+                  controller: _emailController,
                   label: 'Email Address',
                   hintText: 'Enter your email address',
                   prefixIcon: Icons.email_outlined,
@@ -120,7 +141,7 @@ class ForgotPasswordPage extends HookConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Error Message
-                if (errorMessage.value != null)
+                if (_errorMessage != null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -135,7 +156,7 @@ class ForgotPasswordPage extends HookConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            errorMessage.value!,
+                            _errorMessage!,
                             style: TextStyle(
                               color: Colors.red[700],
                               fontSize: 14,
@@ -146,12 +167,12 @@ class ForgotPasswordPage extends HookConsumerWidget {
                     ),
                   ),
 
-                if (errorMessage.value != null) const SizedBox(height: 16),
+                if (_errorMessage != null) const SizedBox(height: 16),
 
                 // Reset Password Button
                 PrimaryButton(
-                  onPressed: isLoading.value ? null : _resetPassword,
-                  isLoading: isLoading.value,
+                  onPressed: _isLoading ? null : _resetPassword,
+                  isLoading: _isLoading,
                   text: 'Send Reset Instructions',
                 ),
 

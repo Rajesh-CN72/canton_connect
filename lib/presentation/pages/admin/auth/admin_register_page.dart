@@ -1,6 +1,7 @@
 // lib/presentation/pages/admin/auth/admin_register_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:canton_connect/data/services/api_service.dart';
 import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
@@ -24,6 +25,8 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
   String? _errorMessage;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  ApiService get _apiService => Provider.of<ApiService>(context, listen: false);
 
   @override
   void dispose() {
@@ -51,7 +54,7 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
     });
 
     try {
-      final authResponse = await ApiService.signUp(
+      final authResponse = await _apiService.signUp(
         _emailController.text.trim(),
         _passwordController.text,
         {
@@ -62,9 +65,11 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
         },
       );
 
-      if (authResponse.user != null) {
+      if (authResponse['user'] != null) {
         // Success - navigate to admin dashboard
-        Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
+        }
       } else {
         setState(() {
           _errorMessage = 'Registration failed. Please try again.';
@@ -75,10 +80,24 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
         _errorMessage = _getErrorMessage(e);
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _obscureConfirmPassword = !_obscureConfirmPassword;
+    });
   }
 
   String _getErrorMessage(dynamic error) {
@@ -196,11 +215,7 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
                             ? Icons.visibility_off_outlined 
                             : Icons.visibility_outlined,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      onPressed: _togglePasswordVisibility,
                     ),
                   ),
                   validator: (value) => Validators.validatePassword(value),
@@ -222,11 +237,7 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
                             ? Icons.visibility_off_outlined 
                             : Icons.visibility_outlined,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
+                      onPressed: _toggleConfirmPasswordVisibility,
                     ),
                   ),
                   validator: (value) {

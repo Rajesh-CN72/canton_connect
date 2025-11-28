@@ -1,10 +1,7 @@
 // lib/presentation/pages/customer/auth/register_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-// Removed unused import: 'package:meta/meta.dart'
+import 'package:provider/provider.dart';
 import 'package:canton_connect/data/services/api_service.dart';
 import 'package:canton_connect/presentation/widgets/custom_text_field.dart';
 import 'package:canton_connect/presentation/widgets/primary_button.dart';
@@ -12,92 +9,140 @@ import 'package:canton_connect/presentation/widgets/auth_header.dart';
 import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
 
-class RegisterPage extends HookConsumerWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(() => GlobalKey<FormState>());
-    final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
-    final confirmPasswordController = useTextEditingController();
-    final fullNameController = useTextEditingController();
-    final phoneController = useTextEditingController();
+  State<RegisterPage> createState() => _RegisterPageState();
+}
 
-    final isLoading = useState(false);
-    final errorMessage = useState<String?>(null);
-    final obscurePassword = useState(true);
-    final obscureConfirmPassword = useState(true);
-    final acceptedTerms = useState(false);
+class _RegisterPageState extends State<RegisterPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
-    Future<void> _register() async {
-      if (!formKey.currentState!.validate()) return;
+  bool _isLoading = false;
+  String? _errorMessage;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _acceptedTerms = false;
 
-      if (!acceptedTerms.value) {
-        errorMessage.value = 'Please accept the Terms & Conditions';
-        return;
-      }
+  ApiService get _apiService => Provider.of<ApiService>(context, listen: false);
 
-      if (passwordController.text != confirmPasswordController.text) {
-        errorMessage.value = 'Passwords do not match';
-        return;
-      }
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _fullNameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
 
-      isLoading.value = true;
-      errorMessage.value = null;
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-        final authResponse = await ApiService.signUp(
-          emailController.text.trim(),
-          passwordController.text,
-          {
-            'full_name': fullNameController.text.trim(),
-            'phone_number': phoneController.text.trim(),
-            'role': 'customer',
-            'created_at': DateTime.now().toIso8601String(),
-          },
-        );
+    if (!_acceptedTerms) {
+      setState(() {
+        _errorMessage = 'Please accept the Terms & Conditions';
+      });
+      return;
+    }
 
-        if (authResponse.user != null) {
-          // Success - navigate to home or verification page
-          if (context.mounted) {
-            // FIX: Remove the email verification check and navigate directly
-            // You can implement email verification logic separately if needed
-            context.go(AppRoutes.home);
-          }
-        } else {
-          errorMessage.value = 'Registration failed. Please try again.';
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authResponse = await _apiService.signUp(
+        _emailController.text.trim(),
+        _passwordController.text,
+        {
+          'full_name': _fullNameController.text.trim(),
+          'phone_number': _phoneController.text.trim(),
+          'role': 'customer',
+          'created_at': DateTime.now().toIso8601String(),
+        },
+      );
+
+      if (authResponse['user'] != null) {
+        // Success - navigate to home
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
-      } catch (e) {
-        errorMessage.value = _getErrorMessage(e);
-      } finally {
-        isLoading.value = false;
+      } else {
+        setState(() {
+          _errorMessage = 'Registration failed. Please try again.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = _getErrorMessage(e);
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
 
-    void _navigateToLogin() {
-      if (!isLoading.value) {
-        // FIX: Remove unawaited and just push without waiting
-        context.push(AppRoutes.login);
-      }
+  void _navigateToLogin() {
+    if (!_isLoading) {
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
+  }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _obscureConfirmPassword = !_obscureConfirmPassword;
+    });
+  }
+
+  void _toggleTermsAccepted(bool? value) {
+    if (!_isLoading) {
+      setState(() {
+        _acceptedTerms = value ?? false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
                 
-                // Back button - FIX: Use lambda instead of tearoff for context.pop
+                // Back button
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, size: 20),
-                  onPressed: () => context.pop(), // Use lambda for void function
+                  onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -114,7 +159,7 @@ class RegisterPage extends HookConsumerWidget {
 
                 // Full Name Field
                 CustomTextField(
-                  controller: fullNameController,
+                  controller: _fullNameController,
                   label: 'Full Name',
                   hintText: 'Enter your full name',
                   prefixIcon: Icons.person_outline,
@@ -125,7 +170,7 @@ class RegisterPage extends HookConsumerWidget {
 
                 // Email Field
                 CustomTextField(
-                  controller: emailController,
+                  controller: _emailController,
                   label: 'Email Address',
                   hintText: 'Enter your email',
                   prefixIcon: Icons.email_outlined,
@@ -137,7 +182,7 @@ class RegisterPage extends HookConsumerWidget {
 
                 // Phone Field (Optional)
                 CustomTextField(
-                  controller: phoneController,
+                  controller: _phoneController,
                   label: 'Phone Number (Optional)',
                   hintText: 'Enter your phone number',
                   prefixIcon: Icons.phone_outlined,
@@ -149,19 +194,19 @@ class RegisterPage extends HookConsumerWidget {
 
                 // Password Field
                 CustomTextField(
-                  controller: passwordController,
+                  controller: _passwordController,
                   label: 'Password',
                   hintText: 'Create a password',
                   prefixIcon: Icons.lock_outline,
-                  obscureText: obscurePassword.value,
+                  obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      obscurePassword.value 
+                      _obscurePassword 
                           ? Icons.visibility_off_outlined 
                           : Icons.visibility_outlined,
                       color: Colors.grey,
                     ),
-                    onPressed: () => obscurePassword.value = !obscurePassword.value,
+                    onPressed: _togglePasswordVisibility,
                   ),
                   validator: Validators.validatePassword,
                 ),
@@ -170,21 +215,21 @@ class RegisterPage extends HookConsumerWidget {
 
                 // Confirm Password Field
                 CustomTextField(
-                  controller: confirmPasswordController,
+                  controller: _confirmPasswordController,
                   label: 'Confirm Password',
                   hintText: 'Confirm your password',
                   prefixIcon: Icons.lock_outline,
-                  obscureText: obscureConfirmPassword.value,
+                  obscureText: _obscureConfirmPassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      obscureConfirmPassword.value 
+                      _obscureConfirmPassword 
                           ? Icons.visibility_off_outlined 
                           : Icons.visibility_outlined,
                       color: Colors.grey,
                     ),
-                    onPressed: () => obscureConfirmPassword.value = !obscureConfirmPassword.value,
+                    onPressed: _toggleConfirmPasswordVisibility,
                   ),
-                  validator: (value) => Validators.validateConfirmPassword(value, passwordController.text),
+                  validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),
                 ),
 
                 const SizedBox(height: 16),
@@ -197,17 +242,15 @@ class RegisterPage extends HookConsumerWidget {
                       width: 24,
                       height: 24,
                       child: Checkbox(
-                        value: acceptedTerms.value,
-                        onChanged: isLoading.value 
-                            ? null 
-                            : (value) => acceptedTerms.value = value ?? false,
+                        value: _acceptedTerms,
+                        onChanged: _toggleTermsAccepted,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: GestureDetector(
-                        onTap: isLoading.value ? null : () {
+                        onTap: _isLoading ? null : () {
                           _showTermsDialog(context);
                         },
                         child: RichText(
@@ -245,7 +288,7 @@ class RegisterPage extends HookConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Error Message
-                if (errorMessage.value != null)
+                if (_errorMessage != null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -260,7 +303,7 @@ class RegisterPage extends HookConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            errorMessage.value!,
+                            _errorMessage!,
                             style: TextStyle(
                               color: Colors.red[700],
                               fontSize: 14,
@@ -271,12 +314,12 @@ class RegisterPage extends HookConsumerWidget {
                     ),
                   ),
 
-                if (errorMessage.value != null) const SizedBox(height: 16),
+                if (_errorMessage != null) const SizedBox(height: 16),
 
                 // Register Button
                 PrimaryButton(
-                  onPressed: isLoading.value ? null : _register,
-                  isLoading: isLoading.value,
+                  onPressed: _isLoading ? null : _register,
+                  isLoading: _isLoading,
                   text: 'Create Account',
                 ),
 

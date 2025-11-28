@@ -1,9 +1,7 @@
 // lib/presentation/pages/customer/auth/login_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:canton_connect/data/services/api_service.dart';
 import 'package:canton_connect/presentation/widgets/custom_text_field.dart';
 import 'package:canton_connect/presentation/widgets/primary_button.dart';
@@ -11,65 +9,95 @@ import 'package:canton_connect/presentation/widgets/auth_header.dart';
 import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
 
-class LoginPage extends HookConsumerWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(() => GlobalKey<FormState>());
-    final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
+  State<LoginPage> createState() => _LoginPageState();
+}
 
-    final isLoading = useState(false);
-    final errorMessage = useState<String?>(null);
-    final obscurePassword = useState(true);
+class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-    void _login() async {
-      if (!formKey.currentState!.validate()) return;
+  bool _isLoading = false;
+  String? _errorMessage;
+  bool _obscurePassword = true;
 
-      isLoading.value = true;
-      errorMessage.value = null;
+  ApiService get _apiService => Provider.of<ApiService>(context, listen: false);
 
-      try {
-        final authResponse = await ApiService.signIn(
-          emailController.text.trim(),
-          passwordController.text,
-        );
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-        if (authResponse.user != null) {
-          // Success - navigate to home
-          if (context.mounted) {
-            context.go(AppRoutes.home);
-          }
-        } else {
-          errorMessage.value = 'Login failed. Please try again.';
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authResponse = await _apiService.signIn(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+
+      if (authResponse['user'] != null) {
+        // Success - navigate to home
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
-      } catch (e) {
-        errorMessage.value = _getErrorMessage(e);
-      } finally {
-        isLoading.value = false;
+      } else {
+        setState(() {
+          _errorMessage = 'Login failed. Please try again.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = _getErrorMessage(e);
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
 
-    void _navigateToRegister() {
-      if (!isLoading.value) {
-        context.push(AppRoutes.register);
-      }
+  void _navigateToRegister() {
+    if (!_isLoading) {
+      Navigator.pushNamed(context, AppRoutes.register);
     }
+  }
 
-    void _navigateToForgotPassword() {
-      if (!isLoading.value) {
-        context.push(AppRoutes.forgotPassword);
-      }
+  void _navigateToForgotPassword() {
+    if (!_isLoading) {
+      Navigator.pushNamed(context, AppRoutes.forgotPassword);
     }
+  }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -78,7 +106,7 @@ class LoginPage extends HookConsumerWidget {
                 // Back button
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, size: 20),
-                  onPressed: () => context.pop(),
+                  onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -95,7 +123,7 @@ class LoginPage extends HookConsumerWidget {
 
                 // Email Field
                 CustomTextField(
-                  controller: emailController,
+                  controller: _emailController,
                   label: 'Email Address',
                   hintText: 'Enter your email',
                   prefixIcon: Icons.email_outlined,
@@ -107,19 +135,19 @@ class LoginPage extends HookConsumerWidget {
 
                 // Password Field
                 CustomTextField(
-                  controller: passwordController,
+                  controller: _passwordController,
                   label: 'Password',
                   hintText: 'Enter your password',
                   prefixIcon: Icons.lock_outline,
-                  obscureText: obscurePassword.value,
+                  obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      obscurePassword.value 
+                      _obscurePassword 
                           ? Icons.visibility_off_outlined 
                           : Icons.visibility_outlined,
                       color: Colors.grey,
                     ),
-                    onPressed: () => obscurePassword.value = !obscurePassword.value,
+                    onPressed: _togglePasswordVisibility,
                   ),
                   validator: (value) => Validators.validatePassword(value),
                 ),
@@ -144,7 +172,7 @@ class LoginPage extends HookConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Error Message
-                if (errorMessage.value != null)
+                if (_errorMessage != null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -159,7 +187,7 @@ class LoginPage extends HookConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            errorMessage.value!,
+                            _errorMessage!,
                             style: TextStyle(
                               color: Colors.red[700],
                               fontSize: 14,
@@ -170,12 +198,12 @@ class LoginPage extends HookConsumerWidget {
                     ),
                   ),
 
-                if (errorMessage.value != null) const SizedBox(height: 16),
+                if (_errorMessage != null) const SizedBox(height: 16),
 
                 // Login Button
                 PrimaryButton(
-                  onPressed: isLoading.value ? null : _login,
-                  isLoading: isLoading.value,
+                  onPressed: _isLoading ? null : _login,
+                  isLoading: _isLoading,
                   text: 'Sign In',
                 ),
 
@@ -206,7 +234,7 @@ class LoginPage extends HookConsumerWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: isLoading.value ? null : () {
+                        onPressed: _isLoading ? null : () {
                           // TODO: Implement Google sign in
                         },
                         icon: Image.asset(
@@ -224,7 +252,7 @@ class LoginPage extends HookConsumerWidget {
                     const SizedBox(width: 16),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: isLoading.value ? null : () {
+                        onPressed: _isLoading ? null : () {
                           // TODO: Implement Apple sign in
                         },
                         icon: const Icon(Icons.apple, size: 20),
@@ -291,7 +319,7 @@ class LoginPage extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Email: demo@cantonconnect.com\nPassword: demo123',
+                          'Email: test@example.com\nPassword: anypassword',
                           style: TextStyle(
                             color: Colors.blue[700],
                             fontSize: 12,
@@ -311,7 +339,7 @@ class LoginPage extends HookConsumerWidget {
   String _getErrorMessage(dynamic error) {
     final errorString = error.toString();
     
-    if (errorString.contains('Invalid login credentials')) {
+    if (errorString.contains('Invalid login credentials') || errorString.contains('Invalid credentials')) {
       return 'Invalid email or password. Please try again.';
     } else if (errorString.contains('Email not confirmed')) {
       return 'Please verify your email address before signing in.';

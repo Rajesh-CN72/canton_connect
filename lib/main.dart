@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide Provider;
-import 'package:canton_connect/core/constants/app_constants.dart';
 import 'package:canton_connect/core/providers/auth_provider.dart';
 import 'package:canton_connect/core/providers/language_provider.dart';
 import 'package:canton_connect/core/providers/currency_provider.dart';
 import 'package:canton_connect/core/providers/order_provider.dart';
+import 'package:canton_connect/data/services/api_service.dart';
+import 'package:canton_connect/data/services/mock_notification_service.dart';
 import 'package:canton_connect/core/widgets/custom_bottom_nav_bar.dart';
 import 'package:canton_connect/core/widgets/custom_app_bar.dart';
 import 'package:canton_connect/presentation/pages/home_page.dart';
@@ -14,6 +14,7 @@ import 'package:canton_connect/presentation/pages/menu_page.dart';
 import 'package:canton_connect/presentation/pages/profile_page.dart';
 import 'package:canton_connect/presentation/pages/order_page.dart';
 import 'package:canton_connect/presentation/pages/health_concepts_page.dart';
+import 'package:canton_connect/presentation/pages/customer/auth/login_page.dart';
 import 'package:canton_connect/presentation/pages/admin/auth/admin_login_page.dart';
 import 'package:canton_connect/routes/route_generator.dart';
 import 'package:canton_connect/routes/app_routes.dart';
@@ -31,11 +32,8 @@ void main() async {
     debugPrint('Flutter Error: ${details.exception}');
   };
 
-  // Initialize Supabase with updated constants
-  await Supabase.initialize(
-    url: AppConstants.supabaseUrl,
-    anonKey: AppConstants.supabaseAnonKey,
-  );
+  // Initialize ApiService before running the app
+  await ApiService().initialize();
   
   runApp(const MyApp());
 }
@@ -56,11 +54,13 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CurrencyProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => OrderProvider()),
+        Provider(create: (context) => ApiService()),
+        Provider(create: (context) => MockNotificationService()),
       ],
       child: Consumer<LanguageProvider>(
         builder: (context, languageProvider, child) {
           return MaterialApp(
-            title: 'Canton Connect',
+            title: '广州连接',
             theme: _buildThemeData(languageProvider.currentLanguage),
             home: const AuthWrapper(),
             initialRoute: AppRoutes.home,
@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 child: child ?? const Scaffold(
                   body: Center(
-                    child: Text('Application loading...'),
+                    child: Text('应用加载中...'),
                   ),
                 ),
               );
@@ -92,65 +92,75 @@ class _MyAppState extends State<MyApp> {
     
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(AppConstants.primaryColorValue),
-        primary: const Color(AppConstants.primaryColorValue),
-        secondary: const Color(AppConstants.secondaryColorValue),
-        surface: const Color(AppConstants.backgroundColorValue),
+        seedColor: const Color(0xFF27AE60), // Green color
+        primary: const Color(0xFF27AE60),
+        secondary: const Color(0xFFFF6B35), // Orange
+        surface: const Color(0xFFF8F9FA), // Fixed: Replaced deprecated 'background' with 'surface'
       ),
       visualDensity: VisualDensity.adaptivePlatformDensity,
       fontFamily: defaultFontFamily,
-      scaffoldBackgroundColor: const Color(AppConstants.backgroundColorValue),
+      scaffoldBackgroundColor: const Color(0xFFF8F9FA),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
-        foregroundColor: Color(AppConstants.primaryColorValue),
+        foregroundColor: Color(0xFF2C3E50),
         elevation: 0,
         centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFF2C3E50)),
       ),
       textTheme: TextTheme(
         displayLarge: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w700,
           fontSize: 32,
+          color: const Color(0xFF2C3E50),
         ),
         displayMedium: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w600,
           fontSize: 28,
+          color: const Color(0xFF2C3E50),
         ),
         displaySmall: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w600,
           fontSize: 24,
+          color: const Color(0xFF2C3E50),
         ),
         headlineMedium: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w600,
           fontSize: 20,
+          color: const Color(0xFF2C3E50),
         ),
         headlineSmall: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w500,
           fontSize: 18,
+          color: const Color(0xFF2C3E50),
         ),
         titleLarge: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w500,
           fontSize: 16,
+          color: const Color(0xFF2C3E50),
         ),
         bodyLarge: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w400,
           fontSize: 16,
+          color: const Color(0xFF566573),
         ),
         bodyMedium: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w400,
           fontSize: 14,
+          color: const Color(0xFF566573),
         ),
         labelLarge: TextStyle(
           fontFamily: defaultFontFamily,
           fontWeight: FontWeight.w500,
           fontSize: 14,
+          color: const Color(0xFF2C3E50),
         ),
       ),
       useMaterial3: true,
@@ -224,6 +234,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final apiService = Provider.of<ApiService>(context, listen: false);
     
     // Show error screen if initialization failed
     if (_hasError) {
@@ -235,7 +246,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
               Text(
-                'Initialization Error',
+                '初始化错误',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -244,7 +255,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Text(
-                  _errorMessage ?? 'Unknown error occurred',
+                  _errorMessage ?? '发生未知错误',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey,
@@ -254,7 +265,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _retryInitialization,
-                child: const Text('Retry'),
+                child: const Text('重试'),
               ),
             ],
           ),
@@ -271,9 +282,15 @@ class _AuthWrapperState extends State<AuthWrapper> {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text(
-                'Loading Canton Connect...',
-                style: Theme.of(context).textTheme.bodyLarge,
+              Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return Text(
+                    languageProvider.currentLanguage == 'zh' 
+                        ? '正在加载广州连接...' 
+                        : 'Loading Canton Connect...',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  );
+                },
               ),
             ],
           ),
@@ -281,7 +298,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
     
-    // Show loading while checking auth state (if needed in future)
+    // Show loading while checking auth state
     if (authProvider.isLoading) {
       return Scaffold(
         body: Center(
@@ -290,9 +307,15 @@ class _AuthWrapperState extends State<AuthWrapper> {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text(
-                'Checking authentication...',
-                style: Theme.of(context).textTheme.bodyLarge,
+              Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return Text(
+                    languageProvider.currentLanguage == 'zh'
+                        ? '检查认证状态...'
+                        : 'Checking authentication...',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  );
+                },
               ),
             ],
           ),
@@ -300,8 +323,13 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
     
-    // TEMPORARY: Bypass login and go directly to MainApp for development
-    return const MainApp();
+    // Check if user is logged in via ApiService
+    if (apiService.isLoggedIn) {
+      return const MainApp();
+    } else {
+      // Navigate to login page if not logged in
+      return const LoginPage();
+    }
   }
 }
 
@@ -448,16 +476,18 @@ class _MainAppState extends State<MainApp> {
   // Method for cart pressed
   void _onCartPressed() {
     debugPrint('Cart tapped from main app bar');
+    // Navigate to cart page or show cart dialog
   }
 
   // Method for search pressed
   void _onSearchPressed() {
     debugPrint('Search tapped');
+    // Navigate to search page or show search dialog
   }
 
   void _onProfilePressed() {
     debugPrint('Profile tapped');
-    // Navigate to profile page or show profile menu
+    // Navigate to profile page
     if (mounted) {
       setState(() {
         _currentBottomNavIndex = 4; // Profile page index
