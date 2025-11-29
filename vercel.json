@@ -9,20 +9,8 @@
   ],
   "routes": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/build/web/assets/$1"
-    },
-    {
-      "src": "/icons/(.*)", 
-      "dest": "/build/web/icons/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/build/web/index.html"
+      "dest": "/build/web/$1"
     }
-  ],
-  "buildCommand": "flutter clean && flutter pub get && flutter build web --release --base-href=/",
-  "outputDirectory": "build/web",
-  "installCommand": "flutter pub get",
-  "framework": null
+  ]
 }
