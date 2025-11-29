@@ -139,9 +139,9 @@ class AppColors {
   }
   
   /// Replaces deprecated color component accessors (.r, .g, .b)
-  static int getRedComponent(Color color) => (color.red * 255.0).round().clamp(0, 255);
-  static int getGreenComponent(Color color) => (color.green * 255.0).round().clamp(0, 255);
-  static int getBlueComponent(Color color) => (color.blue * 255.0).round().clamp(0, 255);
+  static int getRedComponent(Color color) => (color.r * 255.0).round().clamp(0, 255);
+  static int getGreenComponent(Color color) => (color.g * 255.0).round().clamp(0, 255);
+  static int getBlueComponent(Color color) => (color.b * 255.0).round().clamp(0, 255);
   
   /// Creates a color from RGB values with optional opacity
   static Color fromRGB(int r, int g, int b, [double opacity = 1.0]) {
@@ -161,7 +161,7 @@ class AppColors {
 extension AppColorsTheme on AppColors {
   static MaterialColor get primarySwatch {
     return MaterialColor(
-      AppColors.primary.value,
+      AppColors.primary.toARGB32(), // FIXED: Replaced .value with .toARGB32()
       const <int, Color>{
         50: Color(0xFFE8F5E8),
         100: Color(0xFFC8E6C9),
@@ -179,7 +179,7 @@ extension AppColorsTheme on AppColors {
 
   static MaterialColor get secondarySwatch {
     return MaterialColor(
-      AppColors.secondary.value,
+      AppColors.secondary.toARGB32(), // FIXED: Replaced .value with .toARGB32()
       const <int, Color>{
         50: Color(0xFFFFF3E0),
         100: Color(0xFFFFE0B2),
@@ -197,7 +197,7 @@ extension AppColorsTheme on AppColors {
 
   static MaterialColor get accentSwatch {
     return MaterialColor(
-      AppColors.accent.value,
+      AppColors.accent.toARGB32(), // FIXED: Replaced .value with .toARGB32()
       const <int, Color>{
         50: Color(0xFFECEFF1),
         100: Color(0xFFCFD8DC),
@@ -221,10 +221,10 @@ extension ColorUtils on Color {
     return withAlpha((255 * opacity).round());
   }
   
-  /// Get color components as integers (0-255)
-  int get redComponent => (red * 255.0).round().clamp(0, 255);
-  int get greenComponent => (green * 255.0).round().clamp(0, 255);
-  int get blueComponent => (blue * 255.0).round().clamp(0, 255);
+  /// Get color components as integers (0-255) - FIXED: Use new color component accessors
+  int get redComponent => (r * 255.0).round().clamp(0, 255);
+  int get greenComponent => (g * 255.0).round().clamp(0, 255);
+  int get blueComponent => (b * 255.0).round().clamp(0, 255);
   
   /// Darken the color by [amount] (0-1)
   Color darken([double amount = 0.1]) {

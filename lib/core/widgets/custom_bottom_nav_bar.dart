@@ -23,16 +23,17 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            // FIXED: Replaced withOpacity with Color.fromRGBO
+            color: Color.fromRGBO(0, 0, 0, 0.15),
             blurRadius: 15,
-            offset: const Offset(0, -4),
+            offset: Offset(0, -4),
           ),
         ],
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
         ),
@@ -120,8 +121,9 @@ class _NavBarItem extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
+                      // FIXED: Replaced withOpacity with pre-computed color
                       color: isActive 
-                          ? AppColors.primary.withOpacity(0.15)
+                          ? const Color(0x2627AE60) // AppColors.primary.withAlpha(38) - 15% opacity
                           : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
@@ -193,8 +195,9 @@ class _CartNavBarItem extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
+                      // FIXED: Replaced withOpacity with pre-computed color
                       color: isActive 
-                          ? AppColors.primary.withOpacity(0.15)
+                          ? const Color(0x2627AE60) // AppColors.primary.withAlpha(38) - 15% opacity
                           : Colors.transparent,
                       shape: BoxShape.circle,
                     ),

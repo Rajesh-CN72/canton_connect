@@ -5,16 +5,16 @@ import 'package:canton_connect/core/widgets/buttons/primary_button.dart';
 import 'package:canton_connect/core/widgets/buttons/secondary_button.dart';
 
 class EmptyCartState extends StatelessWidget {
-  final Function() onStartShopping;
-  final Function() onBrowseMenu;
+  final VoidCallback onStartShopping;
+  final VoidCallback onBrowseMenu;
   final String currentLanguage;
 
   const EmptyCartState({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.onStartShopping,
     required this.onBrowseMenu,
     required this.currentLanguage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -170,14 +170,14 @@ class EmptyCartState extends StatelessWidget {
 
 // Alternative compact version for modal bottomsheets
 class CompactEmptyCartState extends StatelessWidget {
-  final Function() onStartShopping;
+  final VoidCallback onStartShopping;
   final String currentLanguage;
 
   const CompactEmptyCartState({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.onStartShopping,
     required this.currentLanguage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

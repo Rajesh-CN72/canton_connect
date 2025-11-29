@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:canton_connect/core/constants/app_constants.dart';
-import 'package:canton_connect/core/responsive.dart';
+import 'package:canton_connect/core/utils/responsive.dart';
 
 class CustomLoadingIndicator extends StatelessWidget {
   final String? message;
@@ -13,7 +12,7 @@ class CustomLoadingIndicator extends StatelessWidget {
   final MainAxisAlignment alignment;
 
   const CustomLoadingIndicator({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     this.message,
     this.color,
     this.size,
@@ -22,7 +21,7 @@ class CustomLoadingIndicator extends StatelessWidget {
     this.showMessage = true,
     this.direction = Axis.vertical,
     this.alignment = MainAxisAlignment.center,
-  }) : super(key: key);
+  });
 
   factory CustomLoadingIndicator.small({
     String? message,
@@ -72,19 +71,19 @@ class CustomLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+    
     final effectiveColor = color ?? 
         (usePrimaryColor 
-            ? const Color(AppConstants.primaryColorValue)
+            ? Theme.of(context).primaryColor
             : Colors.grey.shade600);
 
-    final effectiveSize = size ?? Responsive.responsiveValue<double>(
-      context,
-      mobile: 32,
-      tablet: 36,
-      desktop: 40,
+    final effectiveSize = size ?? responsive.responsiveValue(
+      mobile: 32.0,
+      tablet: 36.0,
+      desktop: 40.0,
     );
 
-    // FIXED: Use const constructor for Flex widget
     final widget = Flex(
       direction: direction,
       mainAxisAlignment: alignment,
@@ -100,14 +99,14 @@ class CustomLoadingIndicator extends StatelessWidget {
         ),
         if (showMessage && message != null) ...[
           if (direction == Axis.vertical) 
-            const SizedBox(height: 16)
+            SizedBox(height: responsive.spacingM)
           else 
-            const SizedBox(width: 16),
+            SizedBox(width: responsive.spacingM),
           Flexible(
             child: Text(
               message!,
               style: TextStyle(
-                fontSize: Responsive.getBodyFontSize(context),
+                fontSize: responsive.fontSizeBodyMedium,
                 color: effectiveColor,
                 fontWeight: FontWeight.w500,
               ),
@@ -134,13 +133,13 @@ class ShimmerLoading extends StatelessWidget {
   final Color? highlightColor;
 
   const ShimmerLoading({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.width,
     required this.height,
     this.borderRadius = 8,
     this.baseColor,
     this.highlightColor,
-  }) : super(key: key);
+  });
 
   factory ShimmerLoading.card() {
     return const ShimmerLoading(
@@ -181,27 +180,25 @@ class ShimmerLoading extends StatelessWidget {
 
 class LoadingGrid extends StatelessWidget {
   final int itemCount;
-  final int crossAxisCount;
   final double childAspectRatio;
   final double spacing;
 
   const LoadingGrid({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     this.itemCount = 6,
-    this.crossAxisCount = 2,
     this.childAspectRatio = 0.8,
     this.spacing = 16,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+    
     return GridView.builder(
       shrinkWrap: true,
-      // FIXED: Removed const from NeverScrollableScrollPhysics constructor
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Responsive.responsiveValue<int>(
-          context,
+        crossAxisCount: responsive.getGridCrossAxisCount(
           mobile: 2,
           tablet: 3,
           desktop: 4,
@@ -212,7 +209,6 @@ class LoadingGrid extends StatelessWidget {
       ),
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        // FIXED: Removed const from ShimmerLoading.card() constructor
         return ShimmerLoading.card();
       },
     );
@@ -225,22 +221,20 @@ class LoadingList extends StatelessWidget {
   final double spacing;
 
   const LoadingList({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     this.itemCount = 5,
     this.itemHeight = 80,
     this.spacing = 12,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       shrinkWrap: true,
-      // FIXED: Added const to NeverScrollableScrollPhysics constructor
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
       separatorBuilder: (context, index) => SizedBox(height: spacing),
       itemBuilder: (context, index) {
-        // FIXED: Removed const from ShimmerLoading.listTile() constructor
         return ShimmerLoading.listTile();
       },
     );
@@ -257,7 +251,7 @@ class ProgressiveImageLoader extends StatefulWidget {
   final Widget? errorWidget;
 
   const ProgressiveImageLoader({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.imageUrl,
     this.width,
     this.height,
@@ -265,7 +259,7 @@ class ProgressiveImageLoader extends StatefulWidget {
     this.borderRadius = 8,
     this.placeholder,
     this.errorWidget,
-  }) : super(key: key);
+  });
 
   @override
   State<ProgressiveImageLoader> createState() => _ProgressiveImageLoaderState();
@@ -282,10 +276,11 @@ class _ProgressiveImageLoaderState extends State<ProgressiveImageLoader> {
 
   Future<void> _loadImage() async {
     try {
-      await precacheImage(AssetImage(widget.imageUrl), context);
+      final provider = NetworkImage(widget.imageUrl);
+      await precacheImage(provider, context);
     } catch (e) {
       // Handle image loading error
-      debugPrint('Failed to load image: ${widget.imageUrl}');
+      debugPrint('Failed to load image: ${widget.imageUrl} - $e');
     }
   }
 
@@ -319,11 +314,19 @@ class _ProgressiveImageLoaderState extends State<ProgressiveImageLoader> {
         } else {
           return ClipRRect(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            child: Image.asset(
+            child: Image.network(
               widget.imageUrl,
               width: widget.width,
               height: widget.height,
               fit: widget.fit,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return ShimmerLoading(
+                  width: widget.width ?? double.infinity,
+                  height: widget.height ?? 200,
+                  borderRadius: widget.borderRadius,
+                );
+              },
               errorBuilder: (context, error, stackTrace) {
                 return widget.errorWidget ??
                     Container(
@@ -344,6 +347,71 @@ class _ProgressiveImageLoaderState extends State<ProgressiveImageLoader> {
           );
         }
       },
+    );
+  }
+}
+
+// Additional loading widgets for common use cases
+class LoadingOverlay extends StatelessWidget {
+  final bool isLoading;
+  final Widget child;
+  final String? message;
+  final Color? overlayColor;
+
+  const LoadingOverlay({
+    super.key, // Fixed: Using super parameter
+    required this.isLoading,
+    required this.child,
+    this.message,
+    this.overlayColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        if (isLoading)
+          Container(
+            color: overlayColor ?? Colors.black54,
+            child: Center(
+              child: CustomLoadingIndicator.page(message: message),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class LoadingButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onPressed;
+  final Widget child;
+  final double? width;
+  final double? height;
+  final Color? loadingColor;
+
+  const LoadingButton({
+    super.key, // Fixed: Using super parameter
+    required this.isLoading,
+    required this.onPressed,
+    required this.child,
+    this.width,
+    this.height,
+    this.loadingColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? CustomLoadingIndicator.button()
+            : child,
+      ),
     );
   }
 }

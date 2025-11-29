@@ -8,7 +8,7 @@ import 'package:canton_connect/presentation/widgets/menu/all_menu_section.dart';
 import 'package:canton_connect/presentation/widgets/menu/menu_header_section.dart';
 import 'package:canton_connect/presentation/widgets/menu/family_packages_section.dart';
 import 'package:canton_connect/presentation/widgets/menu/data/menu_data.dart';
-import 'package:canton_connect/core/responsive.dart';
+import 'package:canton_connect/core/utils/responsive.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -254,7 +254,7 @@ class _MenuPageState extends State<MenuPage> {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: Responsive.getHorizontalPadding(context),
+              horizontal: _getHorizontalPadding(context),
             ),
             child: Text(
               currentLanguage == 'zh' ? '特色推荐' : 'Featured Items',
@@ -271,7 +271,7 @@ class _MenuPageState extends State<MenuPage> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(
-                horizontal: Responsive.getHorizontalPadding(context),
+                horizontal: _getHorizontalPadding(context),
               ),
               itemCount: featuredItems.length,
               itemBuilder: (context, index) {
@@ -362,6 +362,17 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
+  // NEW: Helper method to replace the deprecated getHorizontalPadding
+  double _getHorizontalPadding(BuildContext context) {
+    final responsive = Responsive(context);
+    return responsive.getResponsivePadding(
+      16.0, // mobile
+      tablet: 20.0,
+      desktop: 24.0,
+      largeDesktop: 32.0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final headerHeight = _getHeaderHeight(context);
@@ -445,7 +456,7 @@ class _MenuPageState extends State<MenuPage> {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 8,
-        horizontal: Responsive.getHorizontalPadding(context),
+        horizontal: _getHorizontalPadding(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -548,7 +559,7 @@ class _MenuPageState extends State<MenuPage> {
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: Responsive.getHorizontalPadding(context),
+              horizontal: _getHorizontalPadding(context),
               vertical: 24,
             ),
             child: Row(

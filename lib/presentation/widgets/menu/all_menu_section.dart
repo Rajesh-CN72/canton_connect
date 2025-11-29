@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:canton_connect/data/models/food_item.dart';
-import 'package:canton_connect/core/responsive.dart';
+import 'package:canton_connect/core/utils/responsive.dart';
 import 'package:canton_connect/presentation/common/food_card.dart';
 
 class AllMenuSection extends StatelessWidget {
@@ -17,27 +17,29 @@ class AllMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+    
     if (foodItems.isEmpty) {
       return _buildEmptyState();
     }
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: Responsive.getHorizontalPadding(context),
+        horizontal: _getHorizontalPadding(responsive),
       ),
-      child: _buildFoodGrid(context),
+      child: _buildFoodGrid(responsive),
     );
   }
 
-  Widget _buildFoodGrid(BuildContext context) {
+  Widget _buildFoodGrid(Responsive responsive) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _getCrossAxisCount(context),
-        crossAxisSpacing: _getGridSpacing(context),
-        mainAxisSpacing: _getGridSpacing(context),
-        childAspectRatio: _getChildAspectRatio(context),
+        crossAxisCount: _getCrossAxisCount(responsive),
+        crossAxisSpacing: _getGridSpacing(responsive),
+        mainAxisSpacing: _getGridSpacing(responsive),
+        childAspectRatio: _getChildAspectRatio(responsive),
       ),
       itemCount: foodItems.length,
       itemBuilder: (context, index) {
@@ -50,9 +52,18 @@ class AllMenuSection extends StatelessWidget {
     );
   }
 
-  int _getCrossAxisCount(BuildContext context) {
-    return Responsive.responsiveValue<int>(
-      context,
+  // NEW: Helper method to replace the deprecated getHorizontalPadding
+  double _getHorizontalPadding(Responsive responsive) {
+    return responsive.getResponsivePadding(
+      16.0, // mobile
+      tablet: 20.0,
+      desktop: 24.0,
+      largeDesktop: 32.0,
+    );
+  }
+
+  int _getCrossAxisCount(Responsive responsive) {
+    return responsive.responsiveValue(
       mobile: 2,  // Mobile: 2 columns
       tablet: 3,  // Tablet: 3 columns  
       desktop: 4, // Desktop: 4 columns
@@ -60,9 +71,8 @@ class AllMenuSection extends StatelessWidget {
     );
   }
 
-  double _getChildAspectRatio(BuildContext context) {
-    return Responsive.responsiveValue<double>(
-      context,
+  double _getChildAspectRatio(Responsive responsive) {
+    return responsive.responsiveValue(
       mobile: 0.75,   // Taller cards on mobile
       tablet: 0.85,   // Medium aspect ratio on tablet
       desktop: 0.9,   // Wider cards on desktop
@@ -70,9 +80,8 @@ class AllMenuSection extends StatelessWidget {
     );
   }
 
-  double _getGridSpacing(BuildContext context) {
-    return Responsive.responsiveValue<double>(
-      context,
+  double _getGridSpacing(Responsive responsive) {
+    return responsive.responsiveValue(
       mobile: 12.0,   // Tighter spacing on mobile
       tablet: 16.0,   // Medium spacing on tablet
       desktop: 20.0,  // More spacious on desktop

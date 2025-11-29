@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constants.dart';
 
-
 class SecondaryButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -21,7 +20,7 @@ class SecondaryButton extends StatelessWidget {
   final Widget? suffixIcon;
 
   const SecondaryButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
@@ -37,7 +36,7 @@ class SecondaryButton extends StatelessWidget {
     this.hasShadow = false,
     this.prefixIcon,
     this.suffixIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +92,7 @@ class SecondaryButton extends StatelessWidget {
 
   Color _getBorderColor(BuildContext context) {
     if (!isEnabled) return AppColors.borderMedium;
-    if (isLoading) return AppColors.primary.withOpacity(0.5);
+    if (isLoading) return AppColors.primary.withValues(alpha: 0.5);
     return borderColor ?? AppColors.primary;
   }
 
@@ -146,14 +145,14 @@ class SecondaryAccentButton extends StatelessWidget {
   final double? height;
 
   const SecondaryAccentButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.isEnabled = true,
     this.width,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -181,14 +180,14 @@ class SecondaryErrorButton extends StatelessWidget {
   final double? height;
 
   const SecondaryErrorButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.isEnabled = true,
     this.width,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -216,14 +215,14 @@ class SecondarySmallButton extends StatelessWidget {
   final Color? borderColor;
 
   const SecondarySmallButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.isEnabled = true,
     this.textColor,
     this.borderColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +255,7 @@ class SecondaryIconButton extends StatelessWidget {
   final String? tooltip;
 
   const SecondaryIconButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.icon,
     this.isLoading = false,
@@ -265,7 +264,7 @@ class SecondaryIconButton extends StatelessWidget {
     this.iconColor,
     this.borderColor,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:canton_connect/core/responsive.dart';
+import 'package:canton_connect/core/utils/responsive.dart';
 
 class PlaceholderImage extends StatelessWidget {
   final String text;
@@ -9,10 +9,10 @@ class PlaceholderImage extends StatelessWidget {
   final Color color;
   final bool showIcon;
   final BorderRadiusGeometry borderRadius;
-  final bool responsive;
+  final bool useResponsive;
 
   const PlaceholderImage({
-    Key? key,
+    super.key,
     required this.text,
     this.width,
     this.height,
@@ -20,14 +20,15 @@ class PlaceholderImage extends StatelessWidget {
     this.color = Colors.grey,
     this.showIcon = true,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
-    this.responsive = true,
-  }) : super(key: key);
+    this.useResponsive = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final responsiveInstance = Responsive(context);
     final backgroundColor = _generateColorFromString(text);
-    final actualWidth = _getActualWidth(context);
-    final actualHeight = _getActualHeight(context);
+    final actualWidth = _getActualWidth(responsiveInstance);
+    final actualHeight = _getActualHeight(responsiveInstance);
     
     return Container(
       width: actualWidth,
@@ -35,12 +36,11 @@ class PlaceholderImage extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: borderRadius,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.1),
+            color: Color.fromRGBO(0, 0, 0, 0.1), // Fixed: Replaced deprecated withOpacity
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -74,18 +74,18 @@ class PlaceholderImage extends StatelessWidget {
     );
   }
 
-  double _getActualWidth(BuildContext context) {
+  double _getActualWidth(Responsive responsive) {
     if (width != null) return width!;
-    if (responsive) {
-      return Responsive.getImageHeight(context) * 1.5; // Responsive width based on image height
+    if (useResponsive) { // Fixed: Using boolean flag instead of Responsive instance
+      return responsive.getImageHeight() * 1.5; // Responsive width based on image height
     }
     return double.infinity;
   }
 
-  double _getActualHeight(BuildContext context) {
+  double _getActualHeight(Responsive responsive) {
     if (height != null) return height!;
-    if (responsive) {
-      return Responsive.getImageHeight(context); // Use responsive image height
+    if (useResponsive) { // Fixed: Using boolean flag instead of Responsive instance
+      return responsive.getImageHeight(); // Use responsive image height
     }
     return 120;
   }
@@ -219,10 +219,10 @@ class SmartPlaceholderImage extends StatelessWidget {
   final BoxFit fit;
   final bool showIcon;
   final BorderRadiusGeometry borderRadius;
-  final bool responsive;
+  final bool useResponsive;
 
   const SmartPlaceholderImage({
-    Key? key,
+    super.key,
     this.imageUrl,
     required this.placeholderText,
     this.width,
@@ -230,11 +230,13 @@ class SmartPlaceholderImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.showIcon = true,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
-    this.responsive = true,
-  }) : super(key: key);
+    this.useResponsive = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final responsiveInstance = Responsive(context);
+    
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       // Check if it's a network image or asset
       if (imageUrl!.startsWith('http')) {
@@ -250,12 +252,12 @@ class SmartPlaceholderImage extends StatelessWidget {
               height: height,
               showIcon: showIcon,
               borderRadius: borderRadius,
-              responsive: responsive,
+              useResponsive: useResponsive,
             );
           },
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
-            return _buildLoadingPlaceholder(context);
+            return _buildLoadingPlaceholder(responsiveInstance);
           },
         );
       } else {
@@ -272,7 +274,7 @@ class SmartPlaceholderImage extends StatelessWidget {
               height: height,
               showIcon: showIcon,
               borderRadius: borderRadius,
-              responsive: responsive,
+              useResponsive: useResponsive,
             );
           },
         );
@@ -285,14 +287,17 @@ class SmartPlaceholderImage extends StatelessWidget {
       height: height,
       showIcon: showIcon,
       borderRadius: borderRadius,
-      responsive: responsive,
+      useResponsive: useResponsive,
     );
   }
 
-  Widget _buildLoadingPlaceholder(BuildContext context) {
+  Widget _buildLoadingPlaceholder(Responsive responsive) {
+    final actualWidth = _getActualWidth(responsive);
+    final actualHeight = _getActualHeight(responsive);
+    
     return Container(
-      width: width,
-      height: height,
+      width: actualWidth,
+      height: actualHeight,
       decoration: BoxDecoration(
         color: Colors.grey.shade300,
         borderRadius: borderRadius,
@@ -304,6 +309,22 @@ class SmartPlaceholderImage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  double _getActualWidth(Responsive responsive) {
+    if (width != null) return width!;
+    if (useResponsive) { // Fixed: Using boolean flag instead of Responsive instance
+      return responsive.getImageHeight() * 1.5;
+    }
+    return double.infinity;
+  }
+
+  double _getActualHeight(Responsive responsive) {
+    if (height != null) return height!;
+    if (useResponsive) { // Fixed: Using boolean flag instead of Responsive instance
+      return responsive.getImageHeight();
+    }
+    return 120;
   }
 }
 
@@ -317,14 +338,14 @@ class FoodPlaceholderImage extends StatelessWidget {
   final BorderRadiusGeometry borderRadius;
 
   const FoodPlaceholderImage({
-    Key? key,
+    super.key,
     required this.foodName,
     this.imageUrl,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
     this.borderRadius = const BorderRadius.all(Radius.circular(12)),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +357,7 @@ class FoodPlaceholderImage extends StatelessWidget {
       fit: fit,
       showIcon: true,
       borderRadius: borderRadius,
-      responsive: true,
+      useResponsive: true,
     );
   }
 }

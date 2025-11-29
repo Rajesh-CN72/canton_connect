@@ -8,20 +8,20 @@ class SecondaryIconButton extends StatelessWidget {
   final String? tooltip;
 
   const SecondaryIconButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.icon,
     this.color,
     this.size,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
       icon: icon, // Use the widget directly
-      color: color ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+      color: color ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
       iconSize: size, // Map 'size' to 'iconSize'
       tooltip: tooltip,
       splashRadius: 20,

@@ -1,5 +1,7 @@
 // lib/data/services/subscription_service.dart
 
+import 'package:flutter/foundation.dart'; // Added for debugPrint
+
 // Define the models here since they don't exist in your project yet
 class SubscriptionPlan {
   final String id;
@@ -175,7 +177,6 @@ class SubscriptionService {
     final user = await _getUser(userId);
     final updatedCount = user.menuItemsCount + 1;
     
-    // FIXED: Use the correct class name
     if (updatedCount > AppSubscriptionPlans.getPlanById(user.subscriptionPlanId!).maxMenuItems) {
       throw Exception('Menu item limit reached for current subscription plan');
     }
@@ -198,7 +199,8 @@ class SubscriptionService {
   ) async {
     // Update user in your database
     // Implementation depends on your database setup
-    print('Updating user $userId subscription to plan $planId until $expiryDate');
+    // FIXED: Replaced print with debugPrint
+    debugPrint('Updating user $userId subscription to plan $planId until $expiryDate');
     // TODO: Implement actual database update
   }
 
@@ -223,13 +225,15 @@ class SubscriptionService {
   static Future<void> _updateUserMenuItemCount(String userId, int count) async {
     // Update user in database
     // Implementation depends on your database setup
-    print('Updating user $userId menu item count to $count');
+    // FIXED: Replaced print with debugPrint
+    debugPrint('Updating user $userId menu item count to $count');
     // TODO: Implement actual database update
   }
 
   static Future<void> _sendConfirmationEmail(String userId, String planId) async {
     // Send email logic
-    print('Sending confirmation email to user $userId for plan $planId');
+    // FIXED: Replaced print with debugPrint
+    debugPrint('Sending confirmation email to user $userId for plan $planId');
     // TODO: Implement actual email service
   }
 }

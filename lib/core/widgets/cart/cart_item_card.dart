@@ -7,19 +7,19 @@ import 'package:canton_connect/data/models/food_item.dart'; // Import FoodOrder 
 
 class CartItemCard extends StatelessWidget {
   final FoodOrder foodOrder; // Changed from CartItem to FoodOrder
-  final Function() onIncrease;
-  final Function() onDecrease;
-  final Function() onRemove;
+  final VoidCallback onIncrease;
+  final VoidCallback onDecrease;
+  final VoidCallback onRemove;
   final String currentLanguage;
 
   const CartItemCard({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.foodOrder, // Changed parameter name
     required this.onIncrease,
     required this.onDecrease,
     required this.onRemove,
     required this.currentLanguage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class CartItemCard extends StatelessWidget {
           ),
           
           // Add-ons Section
-          if (foodOrder.selectedAddOns.isNotEmpty) ...[ // Fixed: foodOrder instead of cartItem.foodOrder
+          if (foodOrder.selectedAddOns.isNotEmpty) ...[
             const Divider(height: 1),
             _buildAddOnsSection(),
           ],
@@ -88,9 +88,9 @@ class CartItemCard extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-        child: foodOrder.foodItem.images.isNotEmpty // Fixed: foodOrder instead of cartItem.foodOrder
+        child: foodOrder.foodItem.images.isNotEmpty
             ? Image.network(
-                foodOrder.foodItem.images.first, // Fixed: foodOrder instead of cartItem.foodOrder
+                foodOrder.foodItem.images.first,
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -124,8 +124,8 @@ class CartItemCard extends StatelessWidget {
         // Food Name
         Text(
           currentLanguage == 'zh' 
-              ? foodOrder.foodItem.nameZh // Fixed: foodOrder instead of cartItem.foodOrder
-              : foodOrder.foodItem.nameEn, // Fixed: foodOrder instead of cartItem.foodOrder
+              ? foodOrder.foodItem.nameZh
+              : foodOrder.foodItem.nameEn,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -141,8 +141,8 @@ class CartItemCard extends StatelessWidget {
         // Description
         Text(
           currentLanguage == 'zh'
-              ? foodOrder.foodItem.descriptionZh // Fixed: foodOrder instead of cartItem.foodOrder
-              : foodOrder.foodItem.descriptionEn, // Fixed: foodOrder instead of cartItem.foodOrder
+              ? foodOrder.foodItem.descriptionZh
+              : foodOrder.foodItem.descriptionEn,
           style: const TextStyle(
             fontSize: 12,
             color: AppColors.textSecondary,
@@ -156,7 +156,7 @@ class CartItemCard extends StatelessWidget {
         
         // Price
         Text(
-          AppStrings.formatPrice(foodOrder.foodItem.price), // Fixed: foodOrder instead of cartItem.foodOrder
+          AppStrings.formatPrice(foodOrder.foodItem.price),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -189,7 +189,7 @@ class CartItemCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 4,
-            children: foodOrder.selectedAddOns.map((addOn) { // Fixed: foodOrder instead of cartItem.foodOrder
+            children: foodOrder.selectedAddOns.map((addOn) {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -258,12 +258,12 @@ class CartItemCard extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     Icons.remove,
-                    color: foodOrder.quantity > 1  // Fixed: foodOrder instead of cartItem.foodOrder
+                    color: foodOrder.quantity > 1
                         ? AppColors.primary 
                         : AppColors.textDisabled,
                     size: 18,
                   ),
-                  onPressed: foodOrder.quantity > 1 ? onDecrease : null, // Fixed: foodOrder instead of cartItem.foodOrder
+                  onPressed: foodOrder.quantity > 1 ? onDecrease : null,
                   padding: const EdgeInsets.all(4),
                   constraints: const BoxConstraints(
                     minWidth: 36,
@@ -275,7 +275,7 @@ class CartItemCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    '${foodOrder.quantity}', // Fixed: foodOrder instead of cartItem.foodOrder
+                    '${foodOrder.quantity}',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -288,12 +288,12 @@ class CartItemCard extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     Icons.add,
-                    color: foodOrder.quantity < AppConstants.maxQuantityPerItem // Fixed: foodOrder instead of cartItem.foodOrder
+                    color: foodOrder.quantity < AppConstants.maxQuantityPerItem
                         ? AppColors.primary 
                         : AppColors.textDisabled,
                     size: 18,
                   ),
-                  onPressed: foodOrder.quantity < AppConstants.maxQuantityPerItem // Fixed: foodOrder instead of cartItem.foodOrder
+                  onPressed: foodOrder.quantity < AppConstants.maxQuantityPerItem
                       ? onIncrease 
                       : null,
                   padding: const EdgeInsets.all(4),
@@ -310,7 +310,7 @@ class CartItemCard extends StatelessWidget {
           
           // Total Price
           Text(
-            AppStrings.formatPrice(foodOrder.totalPrice), // Fixed: foodOrder instead of cartItem
+            AppStrings.formatPrice(foodOrder.totalPrice),
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,

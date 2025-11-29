@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:canton_connect/core/providers/language_provider.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -75,8 +75,7 @@ class _AccountPageState extends State<AccountPage> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  // FIXED: Use Color.fromRGBO instead of withOpacity
-                                  color: const Color.fromRGBO(39, 174, 96, 0.1), // Color(0xFF27AE60).withOpacity(0.1)
+                                  color: const Color.fromRGBO(39, 174, 96, 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -177,8 +176,12 @@ class _AccountPageState extends State<AccountPage> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            // FIXED: Use Color.fromRGBO instead of withOpacity
-            color: Color.fromRGBO(color.red, color.green, color.blue, 0.1), // color.withOpacity(0.1)
+            color: Color.fromRGBO(
+              (color.red * 255.0).round().clamp(0, 255),
+              (color.green * 255.0).round().clamp(0, 255),
+              (color.blue * 255.0).round().clamp(0, 255),
+              0.1,
+            ),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color),

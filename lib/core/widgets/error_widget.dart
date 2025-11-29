@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:canton_connect/core/constants/app_constants.dart';
-import 'package:canton_connect/core/responsive.dart';
+import 'package:canton_connect/core/utils/responsive.dart';
 
 class CustomErrorWidget extends StatelessWidget {
   final String title;
@@ -12,7 +12,7 @@ class CustomErrorWidget extends StatelessWidget {
   final bool showIcon;
 
   const CustomErrorWidget({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.title,
     required this.message,
     this.buttonText,
@@ -20,7 +20,7 @@ class CustomErrorWidget extends StatelessWidget {
     this.icon,
     this.iconColor,
     this.showIcon = true,
-  }) : super(key: key);
+  });
 
   factory CustomErrorWidget.networkError({
     VoidCallback? onRetry,
@@ -83,8 +83,10 @@ class CustomErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+    
     return Padding(
-      padding: EdgeInsets.all(Responsive.getHorizontalPadding(context)),
+      padding: EdgeInsets.all(responsive.spacingL),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,94 +94,90 @@ class CustomErrorWidget extends StatelessWidget {
             if (showIcon) ...[
               Icon(
                 icon ?? Icons.error_outline,
-                size: Responsive.responsiveValue<double>(
-                  context,
-                  mobile: 64,
-                  tablet: 80,
-                  desktop: 96,
+                size: responsive.responsiveValue(
+                  mobile: 64.0,
+                  tablet: 80.0,
+                  desktop: 96.0,
                 ),
-                color: iconColor ?? const Color(AppConstants.primaryColorValue),
+                color: iconColor ?? Theme.of(context).primaryColor,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: responsive.spacingL),
             ],
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: Responsive.getTitleFontSize(context),
+                fontSize: responsive.fontSizeTitleLarge,
                 fontWeight: FontWeight.w700,
-                color: const Color(AppConstants.primaryColorValue),
+                color: Theme.of(context).primaryColor,
                 fontFamily: AppConstants.primaryFont,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: responsive.spacingM),
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: Responsive.responsiveValue<double>(
-                  context,
-                  mobile: 16,
-                  tablet: 32,
-                  desktop: 48,
+                horizontal: responsive.responsiveValue(
+                  mobile: 16.0,
+                  tablet: 32.0,
+                  desktop: 48.0,
                 ),
               ),
               child: Text(
                 message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: Responsive.getBodyFontSize(context),
+                  fontSize: responsive.fontSizeBodyMedium,
                   color: Colors.grey.shade600,
                   height: 1.5,
                 ),
               ),
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 32),
+              SizedBox(height: responsive.spacingXL),
               SizedBox(
-                width: Responsive.responsiveValue<double>(
-                  context,
+                width: responsive.responsiveValue(
                   mobile: double.infinity,
-                  tablet: 200,
-                  desktop: 200,
+                  tablet: 200.0,
+                  desktop: 200.0,
                 ),
                 child: ElevatedButton(
                   onPressed: onRetry,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(AppConstants.primaryColorValue),
+                    backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(
-                      vertical: Responsive.responsiveValue<double>(
-                        context,
-                        mobile: 16,
-                        tablet: 18,
-                        desktop: 20,
+                      vertical: responsive.responsiveValue(
+                        mobile: 16.0,
+                        tablet: 18.0,
+                        desktop: 20.0,
                       ),
                       horizontal: 24,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(responsive.buttonBorderRadius),
                     ),
                     elevation: 2,
                   ),
                   child: Text(
                     buttonText ?? 'Retry',
                     style: TextStyle(
-                      fontSize: Responsive.getBodyFontSize(context),
+                      fontSize: responsive.fontSizeBodyMedium,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            SizedBox(height: responsive.spacingM),
             // Additional help text for persistent errors
             if (onRetry != null)
               Padding(
-                padding: const EdgeInsets.only(top: 16),
+                padding: EdgeInsets.only(top: responsive.spacingM),
                 child: Text(
                   'If the problem persists, contact support',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: Responsive.getBodyFontSize(context) - 2,
+                    fontSize: responsive.fontSizeBodySmall,
                     color: Colors.grey.shade500,
                   ),
                 ),
@@ -197,10 +195,10 @@ class NetworkErrorWidget extends StatelessWidget {
   final String? customMessage;
 
   const NetworkErrorWidget({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     this.onRetry,
     this.customMessage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,13 +217,13 @@ class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
 
   const EmptyStateWidget({
-    Key? key,
+    super.key, // Fixed: Using super parameter
     required this.title,
     required this.message,
     this.buttonText,
     this.onAction,
     this.icon = Icons.inbox,
-  }) : super(key: key);
+  });
 
   factory EmptyStateWidget.noItems({String? message, VoidCallback? onAction}) {
     return EmptyStateWidget(
@@ -251,86 +249,84 @@ class EmptyStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+    
     return Padding(
-      padding: EdgeInsets.all(Responsive.getHorizontalPadding(context)),
+      padding: EdgeInsets.all(responsive.spacingL),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: Responsive.responsiveValue<double>(
-                context,
-                mobile: 72,
-                tablet: 88,
-                desktop: 104,
+              size: responsive.responsiveValue(
+                mobile: 72.0,
+                tablet: 88.0,
+                desktop: 104.0,
               ),
               color: Colors.grey.shade400,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: responsive.spacingL),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: Responsive.getTitleFontSize(context),
+                fontSize: responsive.fontSizeTitleLarge,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: responsive.spacingM),
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: Responsive.responsiveValue<double>(
-                  context,
-                  mobile: 24,
-                  tablet: 48,
-                  desktop: 72,
+                horizontal: responsive.responsiveValue(
+                  mobile: 24.0,
+                  tablet: 48.0,
+                  desktop: 72.0,
                 ),
               ),
               child: Text(
                 message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: Responsive.getBodyFontSize(context),
+                  fontSize: responsive.fontSizeBodyMedium,
                   color: Colors.grey.shade600,
                   height: 1.5,
                 ),
               ),
             ),
             if (onAction != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: responsive.spacingL),
               SizedBox(
-                width: Responsive.responsiveValue<double>(
-                  context,
+                width: responsive.responsiveValue(
                   mobile: double.infinity,
-                  tablet: 200,
-                  desktop: 200,
+                  tablet: 200.0,
+                  desktop: 200.0,
                 ),
                 child: OutlinedButton(
                   onPressed: onAction,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(AppConstants.primaryColorValue),
-                    side: const BorderSide(
-                      color: Color(AppConstants.primaryColorValue),
+                    foregroundColor: Theme.of(context).primaryColor,
+                    side: BorderSide(
+                      color: Theme.of(context).primaryColor,
                       width: 1.5,
                     ),
                     padding: EdgeInsets.symmetric(
-                      vertical: Responsive.responsiveValue<double>(
-                        context,
-                        mobile: 14,
-                        tablet: 16,
-                        desktop: 18,
+                      vertical: responsive.responsiveValue(
+                        mobile: 14.0,
+                        tablet: 16.0,
+                        desktop: 18.0,
                       ),
                       horizontal: 24,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(responsive.buttonBorderRadius),
                     ),
                   ),
                   child: Text(
                     buttonText ?? 'Action',
                     style: TextStyle(
-                      fontSize: Responsive.getBodyFontSize(context),
+                      fontSize: responsive.fontSizeBodyMedium,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -343,3 +339,77 @@ class EmptyStateWidget extends StatelessWidget {
     );
   }
 }
+
+// Additional specialized error widgets
+class PermissionErrorWidget extends StatelessWidget {
+  final String permissionName;
+  final VoidCallback? onRequestPermission;
+
+  const PermissionErrorWidget({
+    super.key, // Fixed: Using super parameter
+    required this.permissionName,
+    this.onRequestPermission,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Fixed: Removed unused responsive variable or use it
+// Now used in the widget
+    
+    return CustomErrorWidget(
+      title: 'Permission Required',
+      message: 'This app needs $permissionName permission to function properly. '
+          'Please enable it in your device settings.',
+      buttonText: 'Grant Permission',
+      onRetry: onRequestPermission,
+      icon: Icons.lock, // Fixed: Replaced non-existent 'permission_rounded' with 'lock'
+      iconColor: Colors.blue,
+    );
+  }
+}
+
+class LocationErrorWidget extends StatelessWidget {
+  final VoidCallback? onEnableLocation;
+
+  const LocationErrorWidget({
+    super.key, // Fixed: Using super parameter
+    this.onEnableLocation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomErrorWidget(
+      title: 'Location Services Required',
+      message: 'Location services are disabled. '
+          'Please enable location services to use this feature.',
+      buttonText: 'Enable Location',
+      onRetry: onEnableLocation,
+      icon: Icons.location_off,
+      iconColor: Colors.orange,
+    );
+  }
+}
+
+// Extension for easy error widget access
+extension ErrorWidgetExtension on BuildContext {
+  Widget buildNetworkError({VoidCallback? onRetry}) {
+    return NetworkErrorWidget(onRetry: onRetry);
+  }
+
+  Widget buildEmptyState({
+    required String title,
+    required String message,
+    VoidCallback? onAction,
+  }) {
+    return EmptyStateWidget(
+      title: title,
+      message: message,
+      onAction: onAction,
+    );
+  }
+
+  Widget buildLoadingError({VoidCallback? onRetry}) {
+    return CustomErrorWidget.genericError(onRetry: onRetry);
+  }
+}
+

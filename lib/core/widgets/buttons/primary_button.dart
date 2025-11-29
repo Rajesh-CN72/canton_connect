@@ -4,7 +4,7 @@ import '../../constants/app_constants.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // FIXED: Changed to nullable
   final bool isLoading;
   final bool isEnabled;
   final double? width;
@@ -19,9 +19,9 @@ class PrimaryButton extends StatelessWidget {
   final Widget? suffixIcon;
 
   const PrimaryButton({
-    Key? key,
+    super.key, // FIXED: Using super parameter
     required this.text,
-    required this.onPressed,
+    this.onPressed, // FIXED: Removed required since it's nullable
     this.isLoading = false,
     this.isEnabled = true,
     this.width,
@@ -34,16 +34,19 @@ class PrimaryButton extends StatelessWidget {
     this.hasShadow = true,
     this.prefixIcon,
     this.suffixIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    // FIXED: Calculate effective enabled state
+    final effectiveEnabled = isEnabled && onPressed != null && !isLoading;
+    
     return Container(
       width: width ?? double.infinity,
       height: height ?? 50.0,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: hasShadow && isEnabled && !isLoading
+        boxShadow: hasShadow && effectiveEnabled
             ? [
                 BoxShadow(
                   color: AppColors.primary.withOpacity(0.3),
@@ -54,9 +57,9 @@ class PrimaryButton extends StatelessWidget {
             : null,
       ),
       child: ElevatedButton(
-        onPressed: (isEnabled && !isLoading) ? onPressed : null,
+        onPressed: effectiveEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _getBackgroundColor(context),
+          backgroundColor: _getBackgroundColor(context, effectiveEnabled),
           foregroundColor: textColor ?? AppColors.textOnPrimary,
           disabledBackgroundColor: AppColors.disabled,
           disabledForegroundColor: AppColors.textDisabled,
@@ -81,8 +84,8 @@ class PrimaryButton extends StatelessWidget {
     );
   }
 
-  Color _getBackgroundColor(BuildContext context) {
-    if (!isEnabled) return AppColors.disabled;
+  Color _getBackgroundColor(BuildContext context, bool effectiveEnabled) {
+    if (!effectiveEnabled) return AppColors.disabled;
     if (isLoading) return AppColors.primary.withOpacity(0.7);
     return backgroundColor ?? AppColors.primary;
   }
@@ -129,7 +132,7 @@ class PrimaryButton extends StatelessWidget {
 // Gradient variant of primary button
 class PrimaryGradientButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // FIXED: Changed to nullable
   final bool isLoading;
   final bool isEnabled;
   final double? width;
@@ -141,9 +144,9 @@ class PrimaryGradientButton extends StatelessWidget {
   final bool hasShadow;
 
   const PrimaryGradientButton({
-    Key? key,
+    super.key, // FIXED: Using super parameter
     required this.text,
-    required this.onPressed,
+    this.onPressed, // FIXED: Removed required since it's nullable
     this.isLoading = false,
     this.isEnabled = true,
     this.width,
@@ -153,15 +156,18 @@ class PrimaryGradientButton extends StatelessWidget {
     this.borderRadius = AppConstants.buttonBorderRadius,
     this.padding,
     this.hasShadow = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    // FIXED: Calculate effective enabled state
+    final effectiveEnabled = isEnabled && onPressed != null && !isLoading;
+    
     return Container(
       width: width ?? double.infinity,
       height: height ?? 50.0,
       decoration: BoxDecoration(
-        gradient: (isEnabled && !isLoading)
+        gradient: effectiveEnabled
             ? gradient ?? AppColors.primaryGradient
             : const LinearGradient(
                 colors: [
@@ -170,7 +176,7 @@ class PrimaryGradientButton extends StatelessWidget {
                 ],
               ),
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: hasShadow && isEnabled && !isLoading
+        boxShadow: hasShadow && effectiveEnabled
             ? [
                 BoxShadow(
                   color: AppColors.primary.withOpacity(0.3),
@@ -181,7 +187,7 @@ class PrimaryGradientButton extends StatelessWidget {
             : null,
       ),
       child: ElevatedButton(
-        onPressed: (isEnabled && !isLoading) ? onPressed : null,
+        onPressed: effectiveEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           foregroundColor: textColor ?? AppColors.textOnPrimary,
@@ -228,21 +234,21 @@ class PrimaryGradientButton extends StatelessWidget {
 // Small primary button for compact spaces
 class PrimarySmallButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // FIXED: Changed to nullable
   final bool isLoading;
   final bool isEnabled;
   final Color? backgroundColor;
   final Color? textColor;
 
   const PrimarySmallButton({
-    Key? key,
+    super.key, // FIXED: Using super parameter
     required this.text,
-    required this.onPressed,
+    this.onPressed, // FIXED: Removed required since it's nullable
     this.isLoading = false,
     this.isEnabled = true,
     this.backgroundColor,
     this.textColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

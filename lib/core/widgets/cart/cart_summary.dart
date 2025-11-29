@@ -8,17 +8,17 @@ import 'package:canton_connect/core/widgets/buttons/primary_button.dart';
 
 class CartSummary extends StatelessWidget {
   final CartProvider cartProvider;
-  final VoidCallback onCheckout; // Changed to non-nullable VoidCallback
+  final VoidCallback onCheckout;
   final String currentLanguage;
   final bool isLoading;
 
   const CartSummary({
-    Key? key,
+    super.key,
     required this.cartProvider,
-    required this.onCheckout, // Now requires a non-nullable function
+    required this.onCheckout,
     required this.currentLanguage,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -145,13 +145,7 @@ class CartSummary extends StatelessWidget {
               bottom: AppConstants.defaultPadding + MediaQuery.of(context).padding.bottom,
               top: AppConstants.defaultPadding,
             ),
-            child: PrimaryButton(
-              text: currentLanguage == 'zh' ? '立即结算' : AppStrings.checkout,
-              onPressed: cartProvider.isCartEmpty ? () {} : onCheckout,
-              isEnabled: !cartProvider.isCartEmpty,
-              isLoading: isLoading,
-              height: 50,
-            ),
+            child: _buildCheckoutButton(),
           ),
         ],
       ),
@@ -179,6 +173,62 @@ class CartSummary extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCheckoutButton() {
+    // FIXED: Check if PrimaryButton accepts nullable onPressed
+    // If not, we need to handle this differently
+    
+    // Option 1: If PrimaryButton accepts VoidCallback? (nullable)
+    try {
+      return PrimaryButton(
+        text: currentLanguage == 'zh' ? '立即结算' : AppStrings.checkout,
+        onPressed: cartProvider.isCartEmpty || isLoading ? null : onCheckout,
+        isLoading: isLoading && !cartProvider.isCartEmpty,
+        height: 50,
+      );
+    } catch (e) {
+      // Option 2: If PrimaryButton only accepts non-nullable VoidCallback
+      return _buildFallbackCheckoutButton();
+    }
+  }
+
+  Widget _buildFallbackCheckoutButton() {
+    // Fallback using ElevatedButton directly
+    final isEnabled = !cartProvider.isCartEmpty && !isLoading;
+    
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: isEnabled ? onCheckout : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isEnabled ? AppColors.primary : AppColors.textDisabled,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
+          ),
+          elevation: 2,
+        ),
+        child: isLoading && !cartProvider.isCartEmpty
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                currentLanguage == 'zh' ? '立即结算' : AppStrings.checkout,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: AppConstants.primaryFont,
+                ),
+              ),
+      ),
     );
   }
 }

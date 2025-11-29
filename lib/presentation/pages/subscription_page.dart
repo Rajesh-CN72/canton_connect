@@ -428,7 +428,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(AppConstants.primaryColorValue).withValues(alpha: 0.3), // FIXED: withOpacity to withValues
+            color: const Color(AppConstants.primaryColorValue).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -487,7 +487,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.2), // FIXED: withOpacity to withValues
+              color: Colors.white.withValues(alpha: 0.2),
             ),
             child: const Icon(
               Icons.restaurant_menu,
@@ -542,7 +542,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1), // FIXED: withOpacity to withValues
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -663,7 +663,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
       ..._filteredPlans.map((plan) => Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: _buildPlanCard(plan, isMobile),
-      )).toList(),
+      )),
     ];
   }
 
@@ -694,15 +694,15 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    plan.color.withValues(alpha: 0.1), // FIXED: withOpacity to withValues
-                    plan.color.withValues(alpha: 0.05), // FIXED: withOpacity to withValues
+                    plan.color.withValues(alpha: 0.1),
+                    plan.color.withValues(alpha: 0.05),
                   ],
                 )
               : null,
           color: isSelected ? null : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? plan.color : Colors.grey.withValues(alpha: 0.2), // FIXED: withOpacity to withValues
+            color: isSelected ? plan.color : Colors.grey.withValues(alpha: 0.2),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -772,7 +772,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: plan.color.withValues(alpha: 0.1), // FIXED: withOpacity to withValues
+                          color: plan.color.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(plan.icon, color: plan.color, size: 24),
@@ -811,7 +811,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: plan.color.withValues(alpha: 0.05), // FIXED: withOpacity to withValues
+                      color: plan.color.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -845,7 +845,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '${((1 - _getDiscountRate()) * 100).toInt()}% OFF', // FIXED: Removed unnecessary braces
+                              '${((1 - _getDiscountRate()) * 100).toInt()}% OFF',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -1179,8 +1179,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                selectedPlan.color.withValues(alpha: 0.1), // FIXED: withOpacity to withValues
-                selectedPlan.color.withValues(alpha: 0.05), // FIXED: withOpacity to withValues
+                selectedPlan.color.withValues(alpha: 0.1),
+                selectedPlan.color.withValues(alpha: 0.05),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
@@ -1206,7 +1206,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
               ),
               _buildSummaryRow(
                 label: _getDurationText(),
-                value: _selectedDuration > 0 ? '${((1 - _getDiscountRate()) * 100).toInt()}% OFF' : '', // FIXED: Removed unnecessary braces
+                value: _selectedDuration > 0 ? '${((1 - _getDiscountRate()) * 100).toInt()}% OFF' : '',
                 isSecondary: true,
               ),
               
@@ -1238,7 +1238,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
               // Duration Total
               if (weeks > 1)
                 _buildSummaryRow(
-                  label: widget.currentLanguage == 'zh' ? '${_getDurationText()} (${weeks}周)' : '${_getDurationText()} (${weeks} weeks)',
+                  label: widget.currentLanguage == 'zh' ? '${_getDurationText()} ($weeks周)' : '${_getDurationText()} ($weeks weeks)',
                   value: '¥${totalPrice.toStringAsFixed(2)}',
                   isTotal: true,
                 ),
@@ -1319,7 +1319,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
           unitPrice: addon.price,
           total: total,
         );
-      }).toList(),
+      }),
     ];
   }
 
@@ -1343,7 +1343,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
           unitPrice: drink.price,
           total: total,
         );
-      }).toList(),
+      }),
     ];
   }
 
@@ -1367,7 +1367,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
           unitPrice: meal.price,
           total: total,
         );
-      }).toList(),
+      }),
     ];
   }
 
