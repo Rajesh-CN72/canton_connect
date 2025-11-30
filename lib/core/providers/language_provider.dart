@@ -1,54 +1,34 @@
-// lib/presentation/providers/language_provider.dart
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 
 class LanguageProvider with ChangeNotifier {
-  bool _isChinese = false;
-  static const String _languageKey = 'app_language';
-
-  LanguageProvider() {
-    _loadLanguagePreference();
-  }
-
-  bool get isChinese => _isChinese;
-  String get currentLanguage => _isChinese ? 'zh' : 'en';
-
-  // ADD THIS MISSING METHOD
-  Future<void> setLanguage(bool isChinese) async {
-    if (_isChinese == isChinese) return;
-    
-    _isChinese = isChinese;
-    
-    // Save preference
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_languageKey, _isChinese);
-    
+  Locale _currentLocale = const Locale('en');
+  
+  // Return Locale for localization
+  Locale get currentLocale => _currentLocale;
+  
+  // Return language code as string for convenience
+  String get currentLanguage => _currentLocale.languageCode;
+  
+  // Method to change language - takes Locale object
+  void setLanguage(Locale newLocale) {
+    _currentLocale = newLocale;
     notifyListeners();
   }
-
-  Future<void> toggleLanguage() async {
-    _isChinese = !_isChinese;
-    
-    // Save preference
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_languageKey, _isChinese);
-    
+  
+  // Method to change language by string code
+  void setLanguageByCode(String languageCode) {
+    _currentLocale = Locale(languageCode);
     notifyListeners();
   }
-
-  Future<void> _loadLanguagePreference() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedLanguage = prefs.getBool(_languageKey);
-      
-      if (savedLanguage != null) {
-        _isChinese = savedLanguage;
-        notifyListeners();
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error loading language preference: $e');
-      }
-    }
+  
+  // Helper getter for Chinese check
+  bool get isChinese => _currentLocale.languageCode == 'zh';
+  
+  // Toggle between languages
+  void toggleLanguage() {
+    _currentLocale = _currentLocale.languageCode == 'en' 
+        ? const Locale('zh') 
+        : const Locale('en');
+    notifyListeners();
   }
 }

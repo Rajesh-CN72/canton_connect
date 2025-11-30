@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:canton_connect/core/providers/auth_provider.dart';
-import 'package:canton_connect/presentation/pages/admin/admin_dashboard_page.dart';
+import 'package:canton_connect/presentation/pages/admin/admin_dashboard.dart';
 import 'package:canton_connect/presentation/pages/admin/auth/admin_login_page.dart';
 import 'package:canton_connect/core/constants/app_constants.dart';
 

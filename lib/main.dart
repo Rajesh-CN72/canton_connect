@@ -517,7 +517,7 @@ class _MainAppState extends State<MainApp> {
         actions: _appBarActions,
         currentLanguage: currentLanguage,
         onLanguageChanged: (newLanguage) {
-          languageProvider.setLanguage(newLanguage == 'zh');
+          languageProvider.setLanguage(Locale(newLanguage));
         },
         onSubscriptionPlansTap: _onSubscriptionPlansTap,
         onTitleTap: _showSecretAdminDialog, // Secret admin access

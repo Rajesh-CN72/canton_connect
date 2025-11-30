@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 class LocalizationService {
   LocalizationService(this.locale);
@@ -23,7 +22,6 @@ class LocalizationService {
       
       return localizationService;
     } catch (e) {
-      // FIXED: Replaced print with debugPrint for production-safe logging
       debugPrint('Error loading translation file for ${locale.languageCode}: $e');
       // Fallback to English
       return await load(const Locale('en'));
@@ -57,7 +55,7 @@ class LocalizationService {
 
   static const fallbackLocale = Locale('en');
 
-  // Additional helper methods for better localization support
+  // Helper methods
   static bool isSupported(Locale locale) {
     return supportedLocales.any((supported) => supported.languageCode == locale.languageCode);
   }
@@ -65,33 +63,30 @@ class LocalizationService {
   static Locale resolveLocale(Locale? locale) {
     if (locale == null) return fallbackLocale;
     
-    // Check if exact locale is supported
     if (isSupported(locale)) {
       return locale;
     }
     
-    // Check language code only (without country code)
     final languageOnly = Locale(locale.languageCode);
     if (isSupported(languageOnly)) {
       return languageOnly;
     }
     
-    // Fallback to default
     return fallbackLocale;
   }
 
   // Get current language code
-  String get currentLanguage => locale.languageCode;
+  String get currentLanguageCode => locale.languageCode;
 
   // Check if current language is Chinese
-  bool get isChinese => currentLanguage == 'zh';
+  bool get isChinese => currentLanguageCode == 'zh';
 
   // Check if current language is English
-  bool get isEnglish => currentLanguage == 'en';
+  bool get isEnglish => currentLanguageCode == 'en';
 
   // Get display name of current language
   String get languageName {
-    switch (currentLanguage) {
+    switch (currentLanguageCode) {
       case 'en':
         return 'English';
       case 'zh':
@@ -122,7 +117,7 @@ extension LocalizationExtension on BuildContext {
 
   bool get isChinese => localization.isChinese;
   bool get isEnglish => localization.isEnglish;
-  String get currentLanguage => localization.currentLanguage;
+  String get currentLanguageCode => localization.currentLanguageCode;
 }
 
 // Custom LocalizationsDelegate

@@ -22,7 +22,7 @@ class OrderProvider with ChangeNotifier {
         totalAmount: 45.99,
         deliveryFee: 5.00,
         taxAmount: 3.50,
-        paymentMethod: PaymentMethod.card,
+        paymentMethod: PaymentMethod.creditCard,
         paymentStatus: PaymentStatus.completed,
         specialInstructions: 'Please knock on the door',
         items: [

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:canton_connect/core/providers/order_provider.dart';
+import 'package:canton_connect/core/providers/language_provider.dart';
+import 'package:canton_connect/core/widgets/custom_app_bar.dart';
 import 'package:canton_connect/data/models/order_model.dart';
 import 'order_details_sheet.dart';
 
@@ -31,54 +33,68 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isChinese = languageProvider.currentLanguage == 'zh';
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Order Management'),
-        backgroundColor: const Color(0xFF27AE60),
-        foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: const [
-            Tab(text: 'All Orders'),
-            Tab(text: 'Pending'),
-            Tab(text: 'Preparing'),
-            Tab(text: 'Ready'),
-            Tab(text: 'Delivery'),
-            Tab(text: 'Completed'),
-          ],
-        ),
+      appBar: AdminAppBar(
+        title: isChinese ? '订单管理' : 'Order Management',
+        showBackButton: true,
+        currentLanguage: languageProvider.currentLanguage,
+        onLanguageChanged: (newLanguage) {
+          languageProvider.setLanguageByCode(newLanguage);
+        },
       ),
       body: Column(
         children: [
           // Search and Filter Section
-          _buildSearchFilterSection(),
+          _buildSearchFilterSection(isChinese),
+          
+          // Tab Bar
+          Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              labelColor: const Color(0xFF27AE60),
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: const Color(0xFF27AE60),
+              tabs: [
+                Tab(text: isChinese ? '全部订单' : 'All Orders'),
+                Tab(text: isChinese ? '待处理' : 'Pending'),
+                Tab(text: isChinese ? '准备中' : 'Preparing'),
+                Tab(text: isChinese ? '已就绪' : 'Ready'),
+                Tab(text: isChinese ? '配送中' : 'Delivery'),
+                Tab(text: isChinese ? '已完成' : 'Completed'),
+              ],
+            ),
+          ),
           
           // Orders List
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildOrdersList(context, 'all'),
-                _buildOrdersList(context, 'pending'),
-                _buildOrdersList(context, 'preparing'),
-                _buildOrdersList(context, 'ready'),
-                _buildOrdersList(context, 'outForDelivery'),
-                _buildOrdersList(context, 'delivered'),
+                _buildOrdersList(context, 'all', isChinese),
+                _buildOrdersList(context, 'pending', isChinese),
+                _buildOrdersList(context, 'preparing', isChinese),
+                _buildOrdersList(context, 'ready', isChinese),
+                _buildOrdersList(context, 'outForDelivery', isChinese),
+                _buildOrdersList(context, 'delivered', isChinese),
               ],
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showQuickStats,
+        onPressed: () => _showQuickStats(isChinese, context),
         backgroundColor: const Color(0xFF27AE60),
         child: const Icon(Icons.analytics, color: Colors.white),
       ),
     );
   }
 
-  Widget _buildSearchFilterSection() {
+  Widget _buildSearchFilterSection(bool isChinese) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -87,7 +103,9 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search by order ID, customer name, or phone...',
+              hintText: isChinese 
+                ? '搜索订单ID、客户姓名或电话...'
+                : 'Search by order ID, customer name, or phone...',
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -104,15 +122,15 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('Today', 'today'),
+                _buildFilterChip(isChinese ? '今天' : 'Today', 'today', isChinese),
                 const SizedBox(width: 8),
-                _buildFilterChip('This Week', 'week'),
+                _buildFilterChip(isChinese ? '本周' : 'This Week', 'week', isChinese),
                 const SizedBox(width: 8),
-                _buildFilterChip('High Priority', 'high'),
+                _buildFilterChip(isChinese ? '高优先级' : 'High Priority', 'high', isChinese),
                 const SizedBox(width: 8),
-                _buildFilterChip('Delivery', 'delivery'),
+                _buildFilterChip(isChinese ? '外卖' : 'Delivery', 'delivery', isChinese),
                 const SizedBox(width: 8),
-                _buildFilterChip('Pickup', 'pickup'),
+                _buildFilterChip(isChinese ? '自取' : 'Pickup', 'pickup', isChinese),
               ],
             ),
           ),
@@ -121,7 +139,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     );
   }
 
-  Widget _buildFilterChip(String label, String value) {
+  Widget _buildFilterChip(String label, String value, bool isChinese) {
     return FilterChip(
       label: Text(label),
       selected: _filterStatus == value,
@@ -133,7 +151,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     );
   }
 
-  Widget _buildOrdersList(BuildContext context, String status) {
+  Widget _buildOrdersList(BuildContext context, String status, bool isChinese) {
     return Consumer<OrderProvider>(
       builder: (context, orderProvider, child) {
         final orders = orderProvider.getFilteredOrders(
@@ -143,15 +161,15 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
         );
 
         if (orders.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt_long, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
                 Text(
-                  'No orders found',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  isChinese ? '暂无订单' : 'No orders found',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -164,7 +182,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              return _buildOrderCard(order);
+              return _buildOrderCard(order, isChinese);
             },
           ),
         );
@@ -172,9 +190,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     );
   }
 
-  // REPLACED: More robust order card with better error handling
-  Widget _buildOrderCard(Order order) {
-    // Safe order ID handling
+  Widget _buildOrderCard(Order order, bool isChinese) {
     final displayOrderId = _getDisplayOrderId(order.orderId);
     
     return Card(
@@ -183,16 +199,20 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
       child: ListTile(
         leading: _buildOrderStatusIcon(order.status),
         title: Text(
-          'Order #$displayOrderId',
+          isChinese ? '订单 #$displayOrderId' : 'Order #$displayOrderId',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${order.customerName} • ${_formatPhone(order.customerPhone)}'),
-            Text('${order.items.length} ${order.items.length == 1 ? 'item' : 'items'} • \$${order.totalAmount.toStringAsFixed(2)}'),
             Text(
-              '${_formatDateTime(order.orderDate)} • ${_getStatusText(order.status)}',
+              isChinese 
+                ? '${order.items.length} 件商品 • \$${order.totalAmount.toStringAsFixed(2)}'
+                : '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'} • \$${order.totalAmount.toStringAsFixed(2)}'
+            ),
+            Text(
+              '${_formatDateTime(order.orderDate)} • ${_getStatusText(order.status, isChinese)}',
               style: TextStyle(
                 color: _getStatusColor(order.status),
                 fontWeight: FontWeight.w500,
@@ -201,12 +221,11 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () => _showOrderDetails(order),
+        onTap: () => _showOrderDetails(order, isChinese, context),
       ),
     );
   }
 
-  // ADDED: Safe method to get display order ID
   String _getDisplayOrderId(String orderId) {
     try {
       if (orderId.isEmpty) return 'N/A';
@@ -217,20 +236,17 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     }
   }
 
-  // ADDED: Format phone number safely
   String _formatPhone(String phone) {
     if (phone.isEmpty) return 'N/A';
     if (phone.length <= 10) return phone;
     
     try {
-      // Format as (XXX) XXX-XXXX for US numbers
       return '(${phone.substring(0, 3)}) ${phone.substring(3, 6)}-${phone.substring(6)}';
     } catch (e) {
       return phone;
     }
   }
 
-  // ADDED: Better date formatting
   String _formatDateTime(DateTime date) {
     try {
       final now = DateTime.now();
@@ -249,7 +265,6 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     }
   }
 
-  // ADDED: Time formatting
   String _formatTime(DateTime date) {
     try {
       final hour = date.hour;
@@ -271,8 +286,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        // ignore: deprecated_member_use
-        color: Color.fromRGBO((color.red * 255).round(), (color.green * 255).round(), (color.blue * 255).round(), 0.1),
+        color: color.withOpacity(0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 20),
@@ -321,31 +335,82 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
     }
   }
 
-  String _getStatusText(OrderStatus status) {
-    return status.toString().split('.').last;
+  String _getStatusText(OrderStatus status, bool isChinese) {
+    switch (status) {
+      case OrderStatus.pending:
+        return isChinese ? '待处理' : 'Pending';
+      case OrderStatus.confirmed:
+        return isChinese ? '已确认' : 'Confirmed';
+      case OrderStatus.preparing:
+        return isChinese ? '准备中' : 'Preparing';
+      case OrderStatus.ready:
+        return isChinese ? '已就绪' : 'Ready';
+      case OrderStatus.outForDelivery:
+        return isChinese ? '配送中' : 'Out for Delivery';
+      case OrderStatus.delivered:
+        return isChinese ? '已完成' : 'Delivered';
+      case OrderStatus.cancelled:
+        return isChinese ? '已取消' : 'Cancelled';
+      case OrderStatus.refunded:
+        return isChinese ? '已退款' : 'Refunded';
+      default:
+        return status.toString().split('.').last;
+    }
   }
 
-  // REMOVED: Old _formatDate method since we're using _formatDateTime now
-
-  void _showOrderDetails(Order order) {
+  void _showOrderDetails(Order order, bool isChinese, BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => OrderDetailsBottomSheet(order: order),
+      builder: (context) => OrderDetailsBottomSheet(order: order, isChinese: isChinese),
     );
   }
 
-  void _showQuickStats() {
-    // For now, we'll just show a placeholder dialog.
+  void _showQuickStats(bool isChinese, BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Order Statistics'),
-        content: const Text('Order statistics will be displayed here.'),
+        title: Text(isChinese ? '订单统计' : 'Order Statistics'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildStatItem(isChinese ? '今日订单' : "Today's Orders", '12', Colors.blue),
+            _buildStatItem(isChinese ? '待处理' : 'Pending', '3', Colors.orange),
+            _buildStatItem(isChinese ? '总收入' : 'Total Revenue', '\$1,245', Colors.green),
+            _buildStatItem(isChinese ? '平均订单价值' : 'Avg Order Value', '\$103.75', Colors.purple),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(isChinese ? '关闭' : 'Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String title, String value, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(title)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ],
       ),

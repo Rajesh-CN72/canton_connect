@@ -10,9 +10,12 @@ enum OrderStatus {
 }
 
 enum PaymentMethod {
+ creditCard,
+  debitCard,
+  paypal,
   cash,
-  card,
-  mobilePayment,
+  wechat,
+  alipay,
 }
 
 enum PaymentStatus {

@@ -1,8 +1,15 @@
 import 'package:canton_connect/presentation/pages/admin/food_management/add_food_page.dart';
+import 'package:canton_connect/presentation/pages/admin/subscription_management_page.dart';
+import 'package:canton_connect/presentation/pages/admin/order_management/orders_page.dart';
+import 'package:canton_connect/presentation/pages/admin/customers_page.dart';
+import 'package:canton_connect/presentation/pages/admin/analytics_page.dart';
+import 'package:canton_connect/presentation/pages/admin/settings_page.dart';
+import 'package:canton_connect/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:canton_connect/core/providers/auth_provider.dart';
-import 'package:canton_connect/core/constants/app_constants.dart';
+import 'package:canton_connect/core/providers/language_provider.dart';
+import 'dart:async';
 
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
@@ -10,16 +17,22 @@ class AdminDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final isChinese = languageProvider.currentLanguage == 'zh';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: const Color(AppConstants.primaryColorValue),
-        foregroundColor: Colors.white,
+      appBar: AdminAppBar(
+        title: isChinese ? '管理员面板' : 'Admin Dashboard',
+        showBackButton: false,
+        currentLanguage: languageProvider.currentLanguage,
+        onLanguageChanged: (newLanguage) {
+          languageProvider.setLanguageByCode(newLanguage);
+        },
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
+            tooltip: isChinese ? '退出登录' : 'Logout',
           ),
         ],
       ),
@@ -30,16 +43,16 @@ class AdminDashboardPage extends StatelessWidget {
           children: [
             // Welcome message
             Text(
-              'Welcome, ${user?.name ?? 'Admin'}!',
+              isChinese ? '欢迎, ${user?.name ?? '管理员'}!' : 'Welcome, ${user?.name ?? 'Admin'}!',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Manage your restaurant efficiently',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              isChinese ? '高效管理您的餐厅' : 'Manage your restaurant efficiently',
+              style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),
 
@@ -54,38 +67,81 @@ class AdminDashboardPage extends StatelessWidget {
                 ),
                 children: [
                   _buildDashboardCard(
-                    title: 'Food Management',
+                    title: isChinese ? '食品管理' : 'Food Management',
                     icon: Icons.restaurant_menu,
                     color: Colors.blue,
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const  AddFoodPage()),
+                        MaterialPageRoute(builder: (context) => const AddFoodPage()),
                       );
                     },
                   ),
                   _buildDashboardCard(
-                    title: 'Orders',
+                    title: isChinese ? '订阅计划' : 'Subscription Plans',
+                    icon: Icons.subscriptions,
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubscriptionManagementPage(
+                            currentLanguage: languageProvider.currentLanguage,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDashboardCard(
+                    title: isChinese ? '订单管理' : 'Order Management',
                     icon: Icons.shopping_cart,
                     color: Colors.green,
                     onTap: () {
-                      // Navigate to order management
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminOrdersPage(),
+                        ),
+                      );
                     },
                   ),
                   _buildDashboardCard(
-                    title: 'Customers',
+                    title: isChinese ? '客户管理' : 'Customer Management',
                     icon: Icons.people,
                     color: Colors.orange,
                     onTap: () {
-                      // Navigate to customer management
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomersPage(),
+                        ),
+                      );
                     },
                   ),
                   _buildDashboardCard(
-                    title: 'Analytics',
+                    title: isChinese ? '数据分析' : 'Analytics',
                     icon: Icons.analytics,
                     color: Colors.purple,
                     onTap: () {
-                      // Navigate to analytics
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AnalyticsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDashboardCard(
+                    title: isChinese ? '设置' : 'Settings',
+                    icon: Icons.settings,
+                    color: Colors.brown,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsPage(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -115,8 +171,8 @@ class AdminDashboardPage extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0x33FFFFFF), 
+                decoration: BoxDecoration(
+                  color: color.withAlpha(26),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 32),
@@ -137,20 +193,23 @@ class AdminDashboardPage extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) async {
+  Future<void> _logout(BuildContext context) async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final isChinese = languageProvider.currentLanguage == 'zh';
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(isChinese ? '退出登录' : 'Logout'),
+        content: Text(isChinese ? '您确定要退出登录吗？' : 'Are you sure you want to logout?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(isChinese ? '取消' : 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Logout'),
+            child: Text(isChinese ? '退出登录' : 'Logout'),
           ),
         ],
       ),
@@ -158,8 +217,15 @@ class AdminDashboardPage extends StatelessWidget {
 
     if (confirmed == true) {
       await Provider.of<AuthProvider>(context, listen: false).logout();
-      // Navigate to login page
-      Navigator.pushNamedAndRemoveUntil(context, '/admin-login', (route) => false);
+      
+      // Fixed: Check if context is still mounted after async operation
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/admin-login', 
+          (route) => false
+        );
+      }
     }
   }
 }

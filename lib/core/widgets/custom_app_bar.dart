@@ -1,4 +1,3 @@
-// lib/core/widgets/custom_app_bar.dart
 import 'package:flutter/material.dart';
 import 'package:canton_connect/core/constants/app_constants.dart';
 
@@ -8,6 +7,9 @@ enum AppBarActionType {
   profile,
   subscription,
   language,
+  logout,
+  notifications,
+  settings,
 }
 
 class AppBarAction {
@@ -33,6 +35,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Function(String) onLanguageChanged;
   final VoidCallback? onSubscriptionPlansTap;
   final VoidCallback? onTitleTap;
+  final bool isAdmin;
 
   const CustomAppBar({
     super.key,
@@ -42,6 +45,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.onLanguageChanged,
     this.onSubscriptionPlansTap,
     this.onTitleTap,
+    this.isAdmin = false,
   });
 
   @override
@@ -94,14 +98,44 @@ class _CustomAppBarState extends State<CustomAppBar> {
         : AppConstants.sloganEn;
   }
 
+  // Helper method to create admin actions
+  static List<AppBarAction> createAdminActions({
+    required VoidCallback onLogout,
+    required VoidCallback onNotifications,
+    required VoidCallback onSettings,
+    int notificationCount = 0,
+  }) {
+    return [
+      AppBarAction(
+        type: AppBarActionType.notifications,
+        icon: Icons.notifications,
+        label: 'Notifications',
+        badgeCount: notificationCount,
+        onPressed: onNotifications,
+      ),
+      AppBarAction(
+        type: AppBarActionType.settings,
+        icon: Icons.settings,
+        label: 'Settings',
+        onPressed: onSettings,
+      ),
+      AppBarAction(
+        type: AppBarActionType.logout,
+        icon: Icons.logout,
+        label: 'Logout',
+        onPressed: onLogout,
+      ),
+    ];
+  }
+
   List<Widget> _buildDesktopActions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth >= AppConstants.tabletBreakpoint && 
                     screenWidth < AppConstants.desktopBreakpoint;
 
     return [
-      // Subscription Plans (Text Button) - only show on desktop
-      if (!isTablet) 
+      // Subscription Plans (Text Button) - only show on desktop and not for admin
+      if (!isTablet && !widget.isAdmin) 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: TextButton(
@@ -121,12 +155,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
           ),
         ),
 
-      // Action buttons - only show essential ones
-      ...widget.actions.where((action) => 
-        action.type == AppBarActionType.cart || 
-        action.type == AppBarActionType.profile ||
-        action.type == AppBarActionType.language
-      ).map(_buildActionButton),
+      // Action buttons
+      ...widget.actions.map(_buildActionButton),
     ];
   }
 
@@ -135,7 +165,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
       PopupMenuButton<AppBarAction>(
         icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
         onSelected: (action) {
-          // FIX: Handle language action separately for mobile
           if (action.type == AppBarActionType.language) {
             final newLanguage = widget.currentLanguage == 'en' ? 'zh' : 'en';
             widget.onLanguageChanged(newLanguage);
@@ -181,7 +210,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   ] else ...[
                     Icon(
                       action.icon, 
-                      color: const Color(AppConstants.accentColorValue), 
+                      color: action.type == AppBarActionType.logout 
+                          ? Colors.red 
+                          : const Color(AppConstants.accentColorValue), 
                       size: 18
                     ),
                     const SizedBox(width: 8),
@@ -216,6 +247,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _buildActionButton(AppBarAction action) {
     final isLanguageButton = action.type == AppBarActionType.language;
+    final isLogoutButton = action.type == AppBarActionType.logout;
     
     if (isLanguageButton) {
       return Container(
@@ -254,6 +286,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
           ),
         ),
       );
+    } else if (isLogoutButton) {
+      // Special styling for logout button
+      return IconButton(
+        icon: Icon(action.icon, size: 20, color: Colors.red.shade200),
+        onPressed: action.onPressed,
+        tooltip: action.label,
+        padding: const EdgeInsets.all(4),
+      );
     } else {
       return IconButton(
         icon: action.badgeCount > 0
@@ -283,7 +323,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
     final isMobile = screenWidth < AppConstants.tabletBreakpoint;
 
     return AppBar(
-      backgroundColor: const Color(AppConstants.primaryColorValue),
+      backgroundColor: widget.isAdmin 
+          ? const Color(0xFF1a237e) 
+          : const Color(AppConstants.primaryColorValue),
       foregroundColor: Colors.white,
       elevation: widget.isScrolled ? 4 : 0,
       title: widget.isScrolled
@@ -294,7 +336,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   _buildLogo(24),
                   const SizedBox(width: 8),
                   Text(
-                    _getAppName(),
+                    widget.isAdmin ? 'Admin Dashboard' : _getAppName(),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -305,7 +347,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
             )
           : null,
-      flexibleSpace: !widget.isScrolled
+      flexibleSpace: !widget.isScrolled && !widget.isAdmin
           ? GestureDetector(
               onTap: _handleTitleTap,
               child: Container(
@@ -395,31 +437,165 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Widget _buildLogo(double size) {
-    return Image.asset(
-      AppConstants.logoWhitePath,
-      height: size,
+    try {
+      return Image.asset(
+        AppConstants.logoWhitePath,
+        height: size,
+        width: size,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildFallbackLogo(size);
+        },
+      );
+    } catch (e) {
+      return _buildFallbackLogo(size);
+    }
+  }
+
+  Widget _buildFallbackLogo(double size) {
+    return Container(
       width: size,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(size / 4),
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(size / 4),
+      ),
+      child: Center(
+        child: Text(
+          _getAppName().isNotEmpty ? _getAppName().substring(0, 1) : 'C',
+          style: TextStyle(
+            color: const Color(AppConstants.primaryColorValue),
+            fontWeight: FontWeight.bold,
+            fontSize: size * 0.5,
           ),
-          child: Center(
-            child: Text(
-              _getAppName().substring(0, 1),
-              style: TextStyle(
-                color: const Color(AppConstants.primaryColorValue),
-                fontWeight: FontWeight.bold,
-                fontSize: size * 0.5,
-              ),
+        ),
+      ),
+    );
+  }
+}
+
+// Admin-specific App Bar
+class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final List<Widget>? actions;
+  final bool showBackButton;
+  final VoidCallback? onBackPressed;
+  final String currentLanguage;
+  final Function(String) onLanguageChanged;
+
+  const AdminAppBar({
+    super.key,
+    required this.title,
+    this.actions,
+    this.showBackButton = false,
+    this.onBackPressed,
+    required this.currentLanguage,
+    required this.onLanguageChanged,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      backgroundColor: const Color(0xFF1a237e),
+      foregroundColor: Colors.white,
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.3),
+      leading: showBackButton
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
+            )
+          : null,
+      actions: [
+        // Language Switcher for Admin
+        _buildLanguageSwitcher(),
+        
+        // Additional actions
+        ...?actions,
+      ],
+    );
+  }
+
+  Widget _buildLanguageSwitcher() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: DropdownButton<String>(
+        value: currentLanguage,
+        dropdownColor: const Color(0xFF1a237e),
+        underline: const SizedBox(),
+        icon: const Icon(Icons.translate, color: Colors.white),
+        items: [
+          DropdownMenuItem(
+            value: 'en',
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'EN',
+                      style: TextStyle(
+                        color: Color(0xFF1a237e),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('English', style: TextStyle(color: Colors.white)),
+              ],
             ),
           ),
-        );
-      },
+          DropdownMenuItem(
+            value: 'zh',
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      '中',
+                      style: TextStyle(
+                        color: Color(0xFF1a237e),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('中文', style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          ),
+        ],
+        onChanged: (String? newLanguage) {
+          if (newLanguage != null) {
+            onLanguageChanged(newLanguage);
+          }
+        },
+      ),
     );
   }
 }
