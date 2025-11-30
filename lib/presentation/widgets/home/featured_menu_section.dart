@@ -5,7 +5,7 @@ import 'package:canton_connect/core/utils/color_verifier.dart';
 import 'package:canton_connect/core/providers/currency_provider.dart'; // This should work now
 
 class FeaturedMenuSection extends StatelessWidget {
-  const FeaturedMenuSection({Key? key}) : super(key: key);
+  const FeaturedMenuSection({super.key});
 
   @override
   Widget build(BuildContext context) {

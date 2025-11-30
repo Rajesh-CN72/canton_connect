@@ -257,7 +257,7 @@ class OrderDetailsBottomSheet extends StatelessWidget {
 
   void _updateOrderStatus(BuildContext context, OrderStatus newStatus) {
     // In a real app, you would call a method in OrderProvider to update the status
-    debugPrint('Updating order ${order.orderId} to $newStatus');
+    debugdebugPrint('Updating order ${order.orderId} to $newStatus');
     
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(

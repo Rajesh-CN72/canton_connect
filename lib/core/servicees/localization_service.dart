@@ -22,7 +22,7 @@ class LocalizationService {
       
       return localizationService;
     } catch (e) {
-      debugPrint('Error loading translation file for ${locale.languageCode}: $e');
+      debugdebugPrint('Error loading translation file for ${locale.languageCode}: $e');
       // Fallback to English
       return await load(const Locale('en'));
     }

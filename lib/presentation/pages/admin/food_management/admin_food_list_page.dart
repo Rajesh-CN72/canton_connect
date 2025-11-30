@@ -289,7 +289,7 @@ class LocalMenuData {
 }
 
 class FoodListPage extends StatefulWidget {
-  const FoodListPage({Key? key}) : super(key: key);
+  const FoodListPage({super.key});
 
   @override
   State<FoodListPage> createState() => _FoodListPageState();

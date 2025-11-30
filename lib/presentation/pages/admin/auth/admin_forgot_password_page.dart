@@ -487,7 +487,7 @@ class _AdminForgotPasswordPageState extends State<AdminForgotPasswordPage> {
 
       if (mounted) {
         // Log the reset request (in real app, this would be sent to backend)
-        print('Admin password reset requested for: ${_emailController.text}');
+        debugPrint('Admin password reset requested for: ${_emailController.text}');
       }
     }
   }

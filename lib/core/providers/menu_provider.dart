@@ -231,7 +231,7 @@ class MenuProvider with ChangeNotifier {
     } catch (e) {
       _error = 'Failed to load menu data: ${e.toString()}';
       if (kDebugMode) {
-        print('MenuProvider Error: $_error');
+        debugPrint('MenuProvider Error: $_error');
       }
     } finally {
       _setLoading(false);

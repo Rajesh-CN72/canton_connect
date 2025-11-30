@@ -200,7 +200,7 @@ class SubscriptionService {
     // Update user in your database
     // Implementation depends on your database setup
     // FIXED: Replaced print with debugPrint
-    debugPrint('Updating user $userId subscription to plan $planId until $expiryDate');
+    debugdebugPrint('Updating user $userId subscription to plan $planId until $expiryDate');
     // TODO: Implement actual database update
   }
 
@@ -226,14 +226,14 @@ class SubscriptionService {
     // Update user in database
     // Implementation depends on your database setup
     // FIXED: Replaced print with debugPrint
-    debugPrint('Updating user $userId menu item count to $count');
+    debugdebugPrint('Updating user $userId menu item count to $count');
     // TODO: Implement actual database update
   }
 
   static Future<void> _sendConfirmationEmail(String userId, String planId) async {
     // Send email logic
     // FIXED: Replaced print with debugPrint
-    debugPrint('Sending confirmation email to user $userId for plan $planId');
+    debugdebugPrint('Sending confirmation email to user $userId for plan $planId');
     // TODO: Implement actual email service
   }
 }

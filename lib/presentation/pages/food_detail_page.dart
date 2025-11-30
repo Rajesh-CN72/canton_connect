@@ -67,10 +67,10 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         ? ' with ${_selectedAddOns.length} add-on(s)' 
         : '';
     
-    print('Added to cart: ${widget.foodItem.nameEn}');
-    print('Quantity: $_quantity');
-    print('Add-ons: ${_selectedAddOns.map((a) => a.nameEn).toList()}');
-    print('Total: ¥$totalPrice');
+    debugPrint('Added to cart: ${widget.foodItem.nameEn}');
+    debugPrint('Quantity: $_quantity');
+    debugPrint('Add-ons: ${_selectedAddOns.map((a) => a.nameEn).toList()}');
+    debugPrint('Total: ¥$totalPrice');
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -625,7 +625,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    print('See all drinks tapped');
+                    debugPrint('See all drinks tapped');
                   },
                   child: const Text(
                     'See all',
@@ -694,7 +694,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                       const SizedBox(height: 12),
                       GestureDetector(
                         onTap: () {
-                          print('Add drink to cart');
+                          debugPrint('Add drink to cart');
                         },
                         child: Container(
                           width: 36,

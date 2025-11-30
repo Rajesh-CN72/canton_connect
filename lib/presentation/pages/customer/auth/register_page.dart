@@ -10,7 +10,7 @@ import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();

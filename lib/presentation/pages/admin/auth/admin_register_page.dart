@@ -7,7 +7,7 @@ import 'package:canton_connect/utils/validators.dart';
 import 'package:canton_connect/routes/app_routes.dart';
 
 class AdminRegisterPage extends StatefulWidget {
-  const AdminRegisterPage({Key? key}) : super(key: key);
+  const AdminRegisterPage({super.key});
 
   @override
   State<AdminRegisterPage> createState() => _AdminRegisterPageState();

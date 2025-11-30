@@ -856,7 +856,7 @@ class _CustomersPageState extends State<CustomersPage> {
   void _contactCustomer(String phone) {
     // Implement phone call functionality
     // You can use url_launcher package for this
-    print('Contacting customer at: $phone');
+    debugPrint('Contacting customer at: $phone');
   }
 
   void _viewOrderHistory(Customer customer, bool isChinese, BuildContext context) {

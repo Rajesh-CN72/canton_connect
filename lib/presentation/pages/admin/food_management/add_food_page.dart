@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:canton_connect/data/services/api_service.dart';
 
 class AddFoodPage extends StatefulWidget {
-  const AddFoodPage({Key? key}) : super(key: key);
+  const AddFoodPage({super.key});
 
   @override
   State<AddFoodPage> createState() => _AddFoodPageState();

@@ -176,14 +176,14 @@ class CartProvider with ChangeNotifier {
   // Apply promo code (placeholder for future implementation)
   void applyPromoCode(String code) {
     // TODO: Implement promo code logic
-    print('Applying promo code: $code');
+    debugPrint('Applying promo code: $code');
     notifyListeners();
   }
 
   // Set delivery time (placeholder for future implementation)
   void setDeliveryTime(DateTime deliveryTime) {
     // TODO: Implement delivery time logic
-    print('Setting delivery time: $deliveryTime');
+    debugPrint('Setting delivery time: $deliveryTime');
     notifyListeners();
   }
 

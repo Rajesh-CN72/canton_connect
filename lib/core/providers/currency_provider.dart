@@ -36,7 +36,7 @@ class CurrencyProvider with ChangeNotifier {
       return AppConstants.formatPriceWithStyle(price, _currentStyle);
     } catch (e) {
       if (kDebugMode) {
-        print('Error formatting price: $e');
+        debugPrint('Error formatting price: $e');
       }
       return '${AppConstants.currencySymbol}${price.toStringAsFixed(2)}';
     }
@@ -60,7 +60,7 @@ class CurrencyProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {
-        print('Error saving currency style: $e');
+        debugPrint('Error saving currency style: $e');
       }
       // Revert on error
       _currentStyle = _currentStyle;
@@ -87,7 +87,7 @@ class CurrencyProvider with ChangeNotifier {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error loading currency style: $e');
+        debugPrint('Error loading currency style: $e');
       }
       // Continue with default style
     } finally {

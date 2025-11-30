@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
               currentLanguage: currentLanguage,
               onGetStarted: () => _scrollToSection(5),
               onContactUs: () {
-                print('Contact us tapped');
+                debugPrint('Contact us tapped');
               },
             ),
           ),

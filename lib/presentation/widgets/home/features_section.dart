@@ -4,7 +4,7 @@ import 'package:canton_connect/core/providers/language_provider.dart';
 import 'package:canton_connect/core/utils/color_verifier.dart';
 
 class FeaturesSection extends StatelessWidget {
-  const FeaturesSection({Key? key}) : super(key: key);
+  const FeaturesSection({super.key});
 
   @override
   Widget build(BuildContext context) {
