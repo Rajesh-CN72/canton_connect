@@ -45,10 +45,10 @@ class OrderDetailsBottomSheet extends StatelessWidget {
                   _buildInfoSection(isChinese ? '客户信息' : 'Customer Information', [
                     _buildInfoRow(isChinese ? '姓名' : 'Name', order.customerName),
                     _buildInfoRow(isChinese ? '电话' : 'Phone', order.customerPhone),
-                    if (order.customerEmail?.isNotEmpty ?? false) // FIXED: Safe null check
-                      _buildInfoRow(isChinese ? '邮箱' : 'Email', order.customerEmail!),
-                    if (order.deliveryAddress?.isNotEmpty ?? false) // FIXED: Safe null check
-                      _buildInfoRow(isChinese ? '地址' : 'Address', order.deliveryAddress!),
+                    if (order.customerEmail.isNotEmpty) // FIXED: Safe null check
+                      _buildInfoRow(isChinese ? '邮箱' : 'Email', order.customerEmail),
+                    if (order.deliveryAddress.isNotEmpty) // FIXED: Safe null check
+                      _buildInfoRow(isChinese ? '地址' : 'Address', order.deliveryAddress),
                   ]),
                   
                   // Order Items
@@ -257,7 +257,7 @@ class OrderDetailsBottomSheet extends StatelessWidget {
 
   void _updateOrderStatus(BuildContext context, OrderStatus newStatus) {
     // In a real app, you would call a method in OrderProvider to update the status
-    debugdebugPrint('Updating order ${order.orderId} to $newStatus');
+    debugPrint('Updating order ${order.orderId} to $newStatus');
     
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(

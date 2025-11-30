@@ -29,7 +29,7 @@ void main() async {
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     // You can also log to your error reporting service here
-    debugdebugPrint('Flutter Error: ${details.exception}');
+    debugPrint('Flutter Error: ${details.exception}');
   };
   
   runApp(const MyApp());
@@ -444,16 +444,16 @@ class _MainAppState extends State<MainApp> {
 
   // Method for cart pressed
   void _onCartPressed() {
-    debugdebugPrint('Cart tapped from main app bar');
+    debugPrint('Cart tapped from main app bar');
   }
 
   // Method for search pressed
   void _onSearchPressed() {
-    debugdebugPrint('Search tapped');
+    debugPrint('Search tapped');
   }
 
   void _onProfilePressed() {
-    debugdebugPrint('Profile tapped');
+    debugPrint('Profile tapped');
     // Navigate to profile page or show profile menu
     if (mounted) {
       setState(() {
@@ -463,7 +463,7 @@ class _MainAppState extends State<MainApp> {
   }
 
   void _onSubscriptionPlansTap() {
-    debugdebugPrint('Subscription plans tapped');
+    debugPrint('Subscription plans tapped');
     _navigateToSubscriptionPage();
   }
 

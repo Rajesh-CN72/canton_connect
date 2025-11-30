@@ -280,7 +280,7 @@ class _ProgressiveImageLoaderState extends State<ProgressiveImageLoader> {
       await precacheImage(provider, context);
     } catch (e) {
       // Handle image loading error
-      debugdebugPrint('Failed to load image: ${widget.imageUrl} - $e');
+      debugPrint('Failed to load image: ${widget.imageUrl} - $e');
     }
   }
 
