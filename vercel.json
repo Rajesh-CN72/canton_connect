@@ -11,7 +11,5 @@
       "src": "/(.*)",
       "dest": "/build/web/$1"
     }
-  ],
-  "buildCommand": null,
-  "outputDirectory": "build/web"
+  ]
 }
