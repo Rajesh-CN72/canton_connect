@@ -1,18 +1,11 @@
-﻿{
+{
   "name": "canton-connect",
   "version": "1.0.0",
-  "description": "Canton Connect Food Delivery",
+  "description": "Canton Connect Food Delivery API",
   "scripts": {
-    "build": "flutter build web --release --web-renderer html",
     "dev": "netlify dev",
-    "deploy": "netlify deploy --prod",
-    "serve": "serve build/web"
+    "build": "echo 'Build step handled by netlify.toml'"
   },
-  "dependencies": {
-    "express": "^5.1.0"
-  },
-  "devDependencies": {
-    "netlify-cli": "^13.0.0",
-    "serve": "^14.0.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

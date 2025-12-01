@@ -1,14 +1,6 @@
 [build]
   publish = "build/web"
-  command = "bash build.sh"
-
-[build.environment]
-  NODE_VERSION = "18"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+  command = "chmod +x build.sh && ./build.sh"
 
 [[redirects]]
   from = "/*"
@@ -21,5 +13,4 @@
 
 [dev]
   framework = "#static"
-  publish = "build/web"
-  target_port = 3000
+  target_port = 8888
