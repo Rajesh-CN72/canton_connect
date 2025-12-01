@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:canton_connect/core/constants/app_constants.dart';
 import 'package:canton_connect/data/models/subscription_plan.dart';
 import 'package:canton_connect/data/models/food_item.dart';
 import 'package:canton_connect/presentation/pages/admin/subscription_management_page.dart';
 import 'package:canton_connect/presentation/widgets/menu/data/menu_data.dart';
+import 'package:canton_connect/core/widgets/custom_app_bar.dart'; 
+import 'package:canton_connect/core/widgets/custom_bottom_navigation.dart';
 
 class SubscriptionPage extends StatefulWidget {
   final String currentLanguage;
@@ -103,7 +106,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'young_professionals',
         icon: Icons.work_outline,
         color: Colors.blue,
-        maxMenuItems: 10, // ADDED: maxMenuItems parameter
+        maxMenuItems: 10,
       ),
       SubscriptionPlan(
         id: 'office_power',
@@ -130,7 +133,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'young_professionals',
         icon: Icons.business_center,
         color: Colors.green,
-        maxMenuItems: 20, // ADDED: maxMenuItems parameter
+        maxMenuItems: 20,
       ),
 
       // Health & Wellness Plans
@@ -159,7 +162,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'health',
         icon: Icons.spa,
         color: Colors.teal,
-        maxMenuItems: 15, // ADDED: maxMenuItems parameter
+        maxMenuItems: 15,
       ),
       SubscriptionPlan(
         id: 'nutritionist_designed',
@@ -186,7 +189,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'health',
         icon: Icons.monitor_heart,
         color: Colors.purple,
-        maxMenuItems: 30, // ADDED: maxMenuItems parameter
+        maxMenuItems: 30,
       ),
 
       // Family Plans
@@ -213,7 +216,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'family',
         icon: Icons.weekend,
         color: Colors.orange,
-        maxMenuItems: 10, // ADDED: maxMenuItems parameter
+        maxMenuItems: 10,
       ),
       SubscriptionPlan(
         id: 'family_feast',
@@ -240,7 +243,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
         category: 'family',
         icon: Icons.family_restroom,
         color: Colors.red,
-        maxMenuItems: 25, // ADDED: maxMenuItems parameter
+        maxMenuItems: 25,
       ),
     ];
   }
@@ -263,11 +266,63 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      appBar: _buildAppBar(context),
+      body: Column(
+        children: [
+          // Tab Bar
+          Container(
+            color: const Color(AppConstants.primaryColorValue),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              indicatorWeight: 3,
+              tabs: [
+                Tab(text: widget.currentLanguage == 'zh' ? '精选套餐' : 'Featured'),
+                Tab(text: widget.currentLanguage == 'zh' ? '附加项目' : 'Add-ons'),
+                Tab(text: widget.currentLanguage == 'zh' ? '饮品' : 'Drinks'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildFeaturedTab(isMobile),
+                _buildAddOnsTab(isMobile),
+                _buildDrinksTab(isMobile),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNavigation(),
+    );
+  }
+
+  // Build AppBar based on your CustomAppBar capabilities
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    // Check if your CustomAppBar has simple properties
+    try {
+      // Try using CustomAppBar with minimal properties
+      return CustomAppBar(
+        // Use the properties that your CustomAppBar actually supports
+        // Based on common patterns, it might only need:
+        title: widget.currentLanguage == 'zh' ? '订阅套餐' : 'Subscription Plans',
+        // If showBackButton doesn't exist, CustomAppBar might handle it automatically
+      );
+    } catch (e) {
+      // Fallback to standard AppBar
+      return AppBar(
         title: Text(widget.currentLanguage == 'zh' ? '订阅套餐' : 'Subscription Plans'),
         backgroundColor: const Color(AppConstants.primaryColorValue),
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (widget.isAdmin) ...[
             IconButton(
@@ -277,30 +332,36 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
             ),
           ],
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          tabs: [
-            Tab(text: widget.currentLanguage == 'zh' ? '精选套餐' : 'Featured'),
-            Tab(text: widget.currentLanguage == 'zh' ? '附加项目' : 'Add-ons'),
-            Tab(text: widget.currentLanguage == 'zh' ? '饮品' : 'Drinks'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildFeaturedTab(isMobile),
-          _buildAddOnsTab(isMobile),
-          _buildDrinksTab(isMobile),
-        ],
-      ),
-    );
+      );
+    }
   }
 
+  // Build Bottom Navigation
+  Widget? _buildBottomNavigation() {
+    try {
+      return CustomBottomNavigation();
+    } catch (e) {
+      // Fallback to standard BottomNavigationBar
+      return BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.subscriptions),
+            label: 'Subscription',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      );
+    }
+  }
+
+  // Rest of your methods remain the same...
   Widget _buildFeaturedTab(bool isMobile) {
     return SingleChildScrollView(
       child: Container(
@@ -1140,7 +1201,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
     );
   }
 
-  // Selected Plan Summary - UPDATED with detailed breakdown
+  // Selected Plan Summary
   List<Widget> _buildSelectedPlanSummary(bool isMobile) {
     if (_selectedPlanId == null) return [];
 

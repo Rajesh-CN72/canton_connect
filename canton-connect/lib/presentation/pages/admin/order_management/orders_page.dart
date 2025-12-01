@@ -286,7 +286,7 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25), // FIXED: Replaced withOpacity with withAlpha
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 20),
@@ -353,8 +353,6 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> with SingleTickerProv
         return isChinese ? '已取消' : 'Cancelled';
       case OrderStatus.refunded:
         return isChinese ? '已退款' : 'Refunded';
-      default:
-        return status.toString().split('.').last;
     }
   }
 
