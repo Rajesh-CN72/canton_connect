@@ -1,0 +1,19 @@
+﻿{
+    "version":  "1.0.0",
+    "name":  "canton-connect-backend",
+    "description":  "Backend API for Canton Connect",
+    "scripts":  {
+                    "build":  "echo \u0027No build step required\u0027",
+                    "dev":  "netlify dev",
+                    "start":  "node server.js"
+                },
+    "dependencies":  {
+                         "dotenv":  "^16.0.3",
+                         "express":  "^5.1.0",
+                         "cors":  "^2.8.5"
+                     },
+    "devDependencies":  {
+                            "netlify-cli":  "^13.0.0"
+                        },
+    "main":  "server.js"
+}

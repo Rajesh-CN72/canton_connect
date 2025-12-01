@@ -98,36 +98,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
         : AppConstants.sloganEn;
   }
 
-  // Helper method to create admin actions
-  static List<AppBarAction> createAdminActions({
-    required VoidCallback onLogout,
-    required VoidCallback onNotifications,
-    required VoidCallback onSettings,
-    int notificationCount = 0,
-  }) {
-    return [
-      AppBarAction(
-        type: AppBarActionType.notifications,
-        icon: Icons.notifications,
-        label: 'Notifications',
-        badgeCount: notificationCount,
-        onPressed: onNotifications,
-      ),
-      AppBarAction(
-        type: AppBarActionType.settings,
-        icon: Icons.settings,
-        label: 'Settings',
-        onPressed: onSettings,
-      ),
-      AppBarAction(
-        type: AppBarActionType.logout,
-        icon: Icons.logout,
-        label: 'Logout',
-        onPressed: onLogout,
-      ),
-    ];
-  }
-
   List<Widget> _buildDesktopActions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth >= AppConstants.tabletBreakpoint && 
@@ -509,7 +479,8 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: const Color(0xFF1a237e),
       foregroundColor: Colors.white,
       elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.3),
+      // FIXED: Added const keyword to the Color constructor
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.3),
       leading: showBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
