@@ -1,27 +1,39 @@
-﻿# Flutter specific
+﻿# Flutter/Dart
 .dart_tool/
 .packages
 .pub-cache/
 .pub/
 /build/
-/android/build/
-/ios/build/
-/macos/build/
-linux/flutter/
-windows/flutter/
-*.iml
 .flutter-plugins
 .flutter-plugins-dependencies
+*.iml
+*.swp
+*.swo
 
 # Node.js
 node_modules/
-package-lock.json
-yarn.lock
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Build outputs
+# Android
+.android/
+.idea/
+.gradle/
+local.properties
+
+# iOS
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Pods/
+
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Pods/
+
+# Web
 /web/
-/build/web/
 *.js
 *.js.map
 *.dart.js
@@ -33,17 +45,21 @@ FontManifest.json
 NOTICES
 version.json
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
 # Environment
 .env
 .env.local
 .env.*.local
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
 # System
 .DS_Store
 Thumbs.db
+
+# Netlify build artifacts
+.netlify/
