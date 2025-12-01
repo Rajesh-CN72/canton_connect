@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Canton Connect</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        h1 { color: #2c3e50; }
+        button { background: #3498db; color: white; border: none; padding: 10px 15px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2980b9; }
+        .result { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Canton Connect API Server</h1>
+    <p>Test the serverless functions:</p>
+    
+    <button onclick="testFunction()">Test Function</button>
+    <button onclick="getMenu()">Get Menu</button>
+    <button onclick="createOrder()">Create Order</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        const apiBase = '/.netlify/functions';
+        
+        async function testFunction() {
+            try {
+                const response = await fetch(apiBase + '/test');
+                const data = await response.json();
+                showResult('Test Function:', data);
+            } catch (error) {
+                showResult('Error:', error);
+            }
+        }
+        
+        async function getMenu() {
+            try {
+                const response = await fetch(apiBase + '/menu/items');
+                const data = await response.json();
+                showResult('Menu Items:', data);
+            } catch (error) {
+                showResult('Error:', error);
+            }
+        }
+        
+        async function createOrder() {
+            const orderData = {
+                customerName: "Test Customer",
+                items: [
+                    { name: "Dim Sum", price: 25.99 },
+                    { name: "Spring Rolls", price: 8.99 }
+                ]
+            };
+            
+            try {
+                const response = await fetch(apiBase + '/orders/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                const data = await response.json();
+                showResult('Order Created:', data);
+            } catch (error) {
+                showResult('Error:', error);
+            }
+        }
+        
+        function showResult(title, data) {
+            document.getElementById('result').innerHTML = `
+                <div class="result">
+                    <h3>${title}</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

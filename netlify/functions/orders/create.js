@@ -1,54 +1,49 @@
-﻿exports.handler = async (event, context) => {
+exports.handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE'
+      },
+      body: ''
+    };
+  }
+  
   try {
+    let data = {};
+    if (event.body) {
+      data = JSON.parse(event.body);
+    }
+    
+    const response = {
+      success: true,
+      message: 'Order created successfully',
+      orderId: 'ORD_' + Date.now(),
+      customerName: data.customerName || 'Guest',
+      items: data.items || [],
+      total: (data.items || []).reduce((sum, item) => sum + (item.price || 0), 0),
+      timestamp: new Date().toISOString()
+    };
+    
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
+        'Access-Control-Allow-Origin': '*'
       },
-  try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Method Not Allowed" })
-      };
-    }
-
-    const data = JSON.parse(event.body || "{}");
-    
-    // Calculate total
-    const total = data.items ? 
-      data.items.reduce((sum, item) => sum + (item.price || 0), 0) : 0;
-    
-    // Create order with timestamp
-    const order = {
-      id: Date.now().toString(),
-      customerName: data.customerName || "Guest",
-      items: data.items || [],
-      total: total,
-      status: "pending",
-      createdAt: new Date().toISOString()
-    };
-
-    return {
-      statusCode: 201,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      },
-      body: JSON.stringify({
-        success: true,
-        order: order,
-        message: "Order created successfully"
-      })
+      body: JSON.stringify(response)
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ error: error.message })
     };
   }
-};
-
+}

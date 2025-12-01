@@ -1,6 +1,6 @@
 [build]
-  publish = "build/web"
-  command = "chmod +x build.sh && ./build.sh"
+  publish = "."
+  command = ""
 
 [[redirects]]
   from = "/*"
@@ -10,7 +10,3 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-
-[dev]
-  framework = "#static"
-  target_port = 8888
