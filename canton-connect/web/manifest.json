@@ -1,0 +1,94 @@
+{
+    "name": "Canton Connect - Authentic Cantonese Cuisine",
+    "short_name": "Canton Connect",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#27AE60",
+    "description": "Experience authentic Cantonese cuisine delivered fresh to your doorstep. Weekly meal subscriptions and à la carte ordering.",
+    "orientation": "any",
+    "prefer_related_applications": false,
+    "categories": ["food", "lifestyle", "health"],
+    "lang": "en",
+    "dir": "ltr",
+    "scope": "/",
+    "id": "/",
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/mobile-1.png",
+            "sizes": "375x667",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "screenshots/desktop-1.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Weekly Subscription",
+            "short_name": "Subscribe",
+            "description": "Browse weekly meal plans",
+            "url": "/subscription",
+            "icons": [
+                {
+                    "src": "icons/subscription-96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Order History",
+            "short_name": "Orders",
+            "description": "View your past orders",
+            "url": "/orders",
+            "icons": [
+                {
+                    "src": "icons/orders-96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ]
+}

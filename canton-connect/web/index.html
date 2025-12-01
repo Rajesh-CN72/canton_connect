@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="$FLUTTER_BASE_HREF">  <!-- ADD THIS LINE BACK -->
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Canton Connect - Authentic Cantonese cuisine delivered fresh. Weekly meal subscriptions, à la carte ordering, and traditional Guangzhou flavors.">
+  <meta name="keywords" content="cantonese food, meal delivery, subscription, guangzhou cuisine, chinese food, healthy meals">
+  <meta name="author" content="Canton Connect">
+  
+  <!-- Viewport for responsive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="Canton Connect">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Canton Connect">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#27AE60">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="theme-color" content="#27AE60">
+  
+  <!-- iOS Meta Tags & Icons -->
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/Icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/Icon-167.png">
+  
+  <!-- Safari Pinned Tab -->
+  <link rel="mask-icon" href="icons/Icon-maskable-192.svg" color="#27AE60">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="flutter_bootstrap.js" as="script">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Open Graph Meta Tags (for social media sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Canton Connect - Authentic Cantonese Cuisine">
+  <meta property="og:description" content="Experience authentic Cantonese cuisine delivered fresh to your doorstep. Weekly meal subscriptions and à la carte ordering.">
+  <meta property="og:image" content="icons/Icon-512.png">
+  <meta property="og:url" content="https://yourdomain.com">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Canton Connect - Authentic Cantonese Cuisine">
+  <meta name="twitter:description" content="Fresh Cantonese meals delivered weekly to your doorstep.">
+  <meta name="twitter:image" content="icons/Icon-512.png">
+  
+  <!-- App Title -->
+  <title>Canton Connect - Authentic Cantonese Cuisine Delivery</title>
+  
+  <!-- Structured Data (JSON-LD) for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FoodService",
+    "name": "Canton Connect",
+    "description": "Authentic Cantonese cuisine delivered fresh",
+    "url": "https://yourdomain.com",
+    "logo": "https://yourdomain.com/icons/Icon-512.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Guangzhou",
+      "addressCountry": "CN"
+    },
+    "servesCuisine": "Cantonese",
+    "priceRange": "$$"
+  }
+  </script>
+  
+  <!-- Fallback CSS for loading state -->
+  <style>
+    /* Loading animation */
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #27AE60, #2ECC71);
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Hide the loading container when Flutter loads */
+    .flutter-loaded .loading-container {
+      display: none;
+    }
+    
+    /* Basic responsive styles */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    /* Ensure Flutter app takes full height */
+    .flutter-app {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div class="loading-container" id="loadingContainer">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p style="margin-top: 20px; font-size: 16px;">Loading Canton Connect...</p>
+    </div>
+  </div>
+
+  <!-- Flutter app container -->
+  <div class="flutter-app">
+    <!-- Flutter app will be loaded here automatically -->
+  </div>
+
+  <!-- Flutter bootstrap script -->
+  <script src="flutter_bootstrap.js" async></script>
+  
+  <!-- Script to handle loading state (without manual service worker registration) -->
+  <script>
+    // Hide loading screen when Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      document.body.classList.add('flutter-loaded');
+    });
+    
+    // Fallback: hide loading after 10 seconds
+    setTimeout(function() {
+      document.body.classList.add('flutter-loaded');
+    }, 10000);
+
+    // Optional: Handle Flutter initialization errors
+    window.addEventListener('flutter-error', function(event) {
+      console.error('Flutter initialization error:', event.detail);
+      document.getElementById('loadingContainer').innerHTML = 
+        '<div style="text-align: center; padding: 20px;">' +
+        '<h3>Loading Error</h3>' +
+        '<p>Failed to load the application. Please refresh the page.</p>' +
+        '<button onclick="window.location.reload()">Retry</button>' +
+        '</div>';
+    });
+  </script>
+</body>
+</html>
+

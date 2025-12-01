@@ -1,0 +1,11 @@
+{
+  "name": "Flutter Chrome",
+  "type": "chrome",
+  "request": "launch",
+  "url": "http://localhost:63529",
+  "webRoot": "${workspaceFolder}",
+  "runtimeArgs": [
+    "--disable-web-security",
+    "--disable-features=WebRtcHideLocalIpsWithMdns"
+  ]
+}
