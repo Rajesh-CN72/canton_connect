@@ -1,17 +1,25 @@
-﻿[build]
-  command = "flutter build web --release --web-renderer html"
+[build]
   publish = "build/web"
+  command = "bash build.sh"
 
 [build.environment]
-  FLUTTER_VERSION = "3.22.0"
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[[plugins]]
-  package = "@netlify/plugin-lighthouse"
-
 [functions]
   directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[dev]
+  framework = "#static"
+  publish = "build/web"
+  target_port = 3000
