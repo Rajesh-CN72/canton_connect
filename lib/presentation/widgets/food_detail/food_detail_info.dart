@@ -32,7 +32,7 @@ class FoodDetailInfo extends StatelessWidget {
   }
 
   Widget _buildAttributesSection() {
-    Widget _buildAttributeItem(IconData icon, String value, String label) {
+    Widget buildAttributeItem(IconData icon, String value, String label) {
       return Column(
         children: [
           Icon(icon, color: AppColors.primary, size: 24),
@@ -73,16 +73,16 @@ class FoodDetailInfo extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildAttributeItem(Icons.schedule, '${foodItem.preparationTime} min', 'Prep Time'),
-          _buildAttributeItem(Icons.local_fire_department, '${getNutritionValue('calories')} cal', 'Calories'),
-          _buildAttributeItem(Icons.people, '${foodItem.serves} serves', 'Serves'),
+          buildAttributeItem(Icons.schedule, '${foodItem.preparationTime} min', 'Prep Time'),
+          buildAttributeItem(Icons.local_fire_department, '${getNutritionValue('calories')} cal', 'Calories'),
+          buildAttributeItem(Icons.people, '${foodItem.serves} serves', 'Serves'),
         ],
       ),
     );
   }
 
   Widget _buildNutritionSection() {
-    Widget _buildNutritionRow(String label, String value) {
+    Widget buildNutritionRow(String label, String value) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
@@ -157,22 +157,22 @@ class FoodDetailInfo extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildNutritionRow(
+                buildNutritionRow(
                   currentLanguage == 'zh' ? '卡路里' : 'Calories', 
                   '${getNutritionValue('calories')} kcal',
                 ),
                 const Divider(color: AppColors.borderLight, height: 20),
-                _buildNutritionRow(
+                buildNutritionRow(
                   currentLanguage == 'zh' ? '蛋白质' : 'Protein', 
                   '${getNutritionValue('protein')}g',
                 ),
                 const Divider(color: AppColors.borderLight, height: 20),
-                _buildNutritionRow(
+                buildNutritionRow(
                   currentLanguage == 'zh' ? '碳水化合物' : 'Carbohydrates', 
                   '${getNutritionValue('carbs')}g',
                 ),
                 const Divider(color: AppColors.borderLight, height: 20),
-                _buildNutritionRow(
+                buildNutritionRow(
                   currentLanguage == 'zh' ? '脂肪' : 'Fat', 
                   '${getNutritionValue('fat')}g',
                 ),
@@ -323,7 +323,7 @@ class FoodDetailInfo extends StatelessWidget {
   }
 
   Widget _buildReviewsSection() {
-    Widget _buildReviewItem(String name, String comment, int rating) {
+    Widget buildReviewItem(String name, String comment, int rating) {
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -421,19 +421,19 @@ class FoodDetailInfo extends StatelessWidget {
           const SizedBox(height: 16),
           
           // Sample Reviews
-          _buildReviewItem(
+          buildReviewItem(
             '张先生',
             '作为广东人，这家的粤菜非常正宗！每周都订，省去了很多做饭的麻烦。',
             5,
           ),
           const SizedBox(height: 12),
-          _buildReviewItem(
+          buildReviewItem(
             'Lisa Chen',
             'Fresh ingredients, great taste, timely delivery. Already recommended to all my colleagues!',
             5,
           ),
           const SizedBox(height: 12),
-          _buildReviewItem(
+          buildReviewItem(
             '王女士',
             '健康又美味，孩子很喜欢。解决了双职工家庭的吃饭问题。',
             4,

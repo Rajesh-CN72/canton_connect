@@ -138,6 +138,7 @@ class _HomePageState extends State<HomePage> {
                     builder: (context) => SubscriptionPage(
                       currentLanguage: currentLanguage,
                       isAdmin: false, // Set based on your auth logic
+                      showAppBar: true, // ADD THIS LINE - required parameter
                     ),
                   ),
                 );

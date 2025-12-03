@@ -30,7 +30,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
       category: 'basic',
       icon: Icons.restaurant_menu,
       color: Colors.blue,
-      maxMenuItems: 5, // ADDED: maxMenuItems parameter
+      maxMenuItems: 5,
     ),
     const SubscriptionPlan(
       id: 'standard',
@@ -48,7 +48,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
       category: 'standard',
       icon: Icons.star,
       color: Colors.green,
-      maxMenuItems: 10, // ADDED: maxMenuItems parameter
+      maxMenuItems: 10,
     ),
     const SubscriptionPlan(
       id: 'premium',
@@ -67,7 +67,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
       category: 'premium',
       icon: Icons.diamond,
       color: Colors.purple,
-      maxMenuItems: 20, // ADDED: maxMenuItems parameter
+      maxMenuItems: 20,
     ),
   ];
 
@@ -78,7 +78,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
   final _periodController = TextEditingController();
   final _categoryController = TextEditingController();
   final _featuresController = TextEditingController();
-  final _maxMenuItemsController = TextEditingController(); // ADDED: Controller for maxMenuItems
+  final _maxMenuItemsController = TextEditingController();
   bool _isPopular = false;
   String _editingPlanId = '';
 
@@ -121,7 +121,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
     _periodController.dispose();
     _categoryController.dispose();
     _featuresController.dispose();
-    _maxMenuItemsController.dispose(); // ADDED: Dispose maxMenuItems controller
+    _maxMenuItemsController.dispose();
     super.dispose();
   }
 
@@ -134,7 +134,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
       _periodController.text = plan.period;
       _categoryController.text = plan.category;
       _featuresController.text = plan.features.join('\n');
-      _maxMenuItemsController.text = plan.maxMenuItems.toString(); // ADDED: Set maxMenuItems
+      _maxMenuItemsController.text = plan.maxMenuItems.toString();
       _isPopular = plan.isPopular;
       _selectedIcon = plan.icon;
       _selectedColor = plan.color;
@@ -156,7 +156,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
         category: _categoryController.text,
         icon: _selectedIcon,
         color: _selectedColor,
-        maxMenuItems: int.parse(_maxMenuItemsController.text), // ADDED: maxMenuItems parameter
+        maxMenuItems: int.parse(_maxMenuItemsController.text),
       );
 
       setState(() {
@@ -184,7 +184,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
     _periodController.clear();
     _categoryController.clear();
     _featuresController.clear();
-    _maxMenuItemsController.clear(); // ADDED: Clear maxMenuItems controller
+    _maxMenuItemsController.clear();
     _isPopular = false;
     _selectedIcon = Icons.restaurant_menu;
     _selectedColor = Colors.blue;
@@ -210,7 +210,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
           category: plan.category,
           icon: plan.icon,
           color: plan.color,
-          maxMenuItems: plan.maxMenuItems, // ADDED: maxMenuItems parameter
+          maxMenuItems: plan.maxMenuItems,
         );
         _plans[index] = updatedPlan;
       }
@@ -458,7 +458,6 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                           },
                         ),
                         const SizedBox(height: 16),
-                        // ADDED: Max Menu Items Field
                         TextFormField(
                           controller: _maxMenuItemsController,
                           decoration: const InputDecoration(
@@ -599,7 +598,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: plan.color.withValues(alpha: 0.1),
+                                  color: plan.color.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(plan.icon, color: plan.color, size: 24),
@@ -670,7 +669,6 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                                 ),
                               ),
                               const SizedBox(width: 16),
-                              // ADDED: Display max menu items
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
@@ -699,7 +697,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                                 feature,
                                 style: const TextStyle(fontSize: 12),
                               ),
-                              backgroundColor: plan.color.withValues(alpha: 0.1),
+                              backgroundColor: plan.color.withOpacity(0.1),
                               labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                             )).toList(),
                           ),

@@ -11,8 +11,6 @@ class SubscriptionPlan {
   final String category;
   final IconData icon;
   final Color color;
-  
-  // ADD: maxMenuItems for vendor subscription limits
   final int maxMenuItems;
   
   // New meal selection properties
@@ -35,8 +33,6 @@ class SubscriptionPlan {
     required this.category, 
     required this.icon,
     required this.color,
-    
-    // ADD: maxMenuItems parameter
     required this.maxMenuItems,
     
     // New parameters with default values
@@ -49,7 +45,6 @@ class SubscriptionPlan {
     this.availableTimeSlots = const ['11:00-13:00', '17:00-19:00'],
   });
 
-  // Optional: Add a toJson method if needed for serialization
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -60,7 +55,7 @@ class SubscriptionPlan {
       'features': features,
       'isPopular': isPopular,
       'category': category,
-      'maxMenuItems': maxMenuItems, // ADD: Include in JSON
+      'maxMenuItems': maxMenuItems,
       'mealsPerWeek': mealsPerWeek,
       'availableMealTypes': availableMealTypes,
       'dietaryOptions': dietaryOptions,
@@ -68,7 +63,6 @@ class SubscriptionPlan {
       'allowCustomization': allowCustomization,
       'availableDeliveryDays': availableDeliveryDays,
       'availableTimeSlots': availableTimeSlots,
-      // Note: icon and color are not included in JSON as they are Flutter-specific
     };
   }
 
@@ -121,8 +115,6 @@ class SubscriptionPlan {
   }
 }
 
-enum SubscriptionLayout { mobile, tablet, desktop }
-
 class SubscriptionContentPlanner {
   static List<SubscriptionPlan> getPlans(String language) {
     final isChinese = language == 'zh';
@@ -149,8 +141,7 @@ class SubscriptionContentPlanner {
         category: 'young_professionals',
         icon: Icons.work_outline,
         color: Colors.blue,
-        maxMenuItems: 10, // ADD: Menu item limit for vendors
-        // New meal properties
+        maxMenuItems: 10,
         mealsPerWeek: 3,
         availableMealTypes: ['lunch', 'dinner'],
         dietaryOptions: ['regular', 'vegetarian'],
@@ -182,12 +173,11 @@ class SubscriptionContentPlanner {
         category: 'young_professionals',
         icon: Icons.business_center,
         color: Colors.green,
-        maxMenuItems: 20, // ADD: Menu item limit for vendors
-        // New meal properties
+        maxMenuItems: 20,
         mealsPerWeek: 5,
-        availableMealTypes: ['lunch'], // Lunch only for office plans
+        availableMealTypes: ['lunch'],
         dietaryOptions: ['regular', 'vegetarian', 'low_carb'],
-        selectionDeadlineHours: 24, // Shorter deadline for office lunches
+        selectionDeadlineHours: 24,
         allowCustomization: false,
         availableDeliveryDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
         availableTimeSlots: ['11:00-12:00', '12:00-13:00'],
@@ -215,12 +205,11 @@ class SubscriptionContentPlanner {
         category: 'health',
         icon: Icons.monitor_heart,
         color: Colors.purple,
-        maxMenuItems: 30, // ADD: Menu item limit for vendors
-        // New meal properties
-        mealsPerWeek: 7, // Full week of meals
+        maxMenuItems: 30,
+        mealsPerWeek: 7,
         availableMealTypes: ['lunch', 'dinner'],
         dietaryOptions: ['regular', 'vegetarian', 'vegan', 'low_carb', 'gluten_free'],
-        selectionDeadlineHours: 72, // Longer planning window
+        selectionDeadlineHours: 72,
         allowCustomization: true,
         availableDeliveryDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
         availableTimeSlots: ['10:00-12:00', '12:00-14:00', '17:00-19:00', '19:00-21:00'],
@@ -248,10 +237,9 @@ class SubscriptionContentPlanner {
         category: 'family',
         icon: Icons.family_restroom,
         color: Colors.red,
-        maxMenuItems: 25, // ADD: Menu item limit for vendors
-        // New meal properties
-        mealsPerWeek: 4, // 4 family dinners per week
-        availableMealTypes: ['dinner'], // Dinner only for family plans
+        maxMenuItems: 25,
+        mealsPerWeek: 4,
+        availableMealTypes: ['dinner'],
         dietaryOptions: ['regular', 'vegetarian', 'child_friendly'],
         selectionDeadlineHours: 48,
         allowCustomization: true,
@@ -281,13 +269,12 @@ class SubscriptionContentPlanner {
         category: 'health',
         icon: Icons.spa,
         color: Colors.teal,
-        maxMenuItems: 15, // ADD: Menu item limit for vendors
-        // New meal properties
+        maxMenuItems: 15,
         mealsPerWeek: 5,
         availableMealTypes: ['lunch', 'dinner'],
         dietaryOptions: ['regular', 'vegetarian', 'tcm_wellness'],
         selectionDeadlineHours: 72,
-        allowCustomization: false, // Fixed menu for wellness plan
+        allowCustomization: false,
         availableDeliveryDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
         availableTimeSlots: ['11:00-13:00', '17:00-19:00'],
       ),
@@ -312,12 +299,11 @@ class SubscriptionContentPlanner {
         category: 'family',
         icon: Icons.weekend,
         color: Colors.orange,
-        maxMenuItems: 10, // ADD: Menu item limit for vendors
-        // New meal properties
-        mealsPerWeek: 2, // Weekend only
+        maxMenuItems: 10,
+        mealsPerWeek: 2,
         availableMealTypes: ['lunch', 'dinner'],
         dietaryOptions: ['regular', 'vegetarian', 'child_friendly'],
-        selectionDeadlineHours: 96, // Plan weekend meals earlier
+        selectionDeadlineHours: 96,
         allowCustomization: true,
         availableDeliveryDays: ['saturday', 'sunday'],
         availableTimeSlots: ['10:00-12:00', '12:00-14:00', '17:00-19:00'],
@@ -336,17 +322,14 @@ class SubscriptionContentPlanner {
     };
   }
 
-  // Helper method to get plans by category
   static List<SubscriptionPlan> getPlansByCategory(String category, String language) {
     return getPlans(language).where((plan) => plan.category == category).toList();
   }
 
-  // Helper method to get popular plans
   static List<SubscriptionPlan> getPopularPlans(String language) {
     return getPlans(language).where((plan) => plan.isPopular).toList();
   }
 
-  // Helper method to find plan by ID
   static SubscriptionPlan? getPlanById(String id, String language) {
     try {
       return getPlans(language).firstWhere((plan) => plan.id == id);
@@ -355,18 +338,15 @@ class SubscriptionContentPlanner {
     }
   }
 
-  // New helper method to get plans that support specific dietary options
   static List<SubscriptionPlan> getPlansByDietaryOption(String dietaryOption, String language) {
     return getPlans(language).where((plan) => plan.supportsDietaryOption(dietaryOption)).toList();
   }
 
-  // New helper method to get plans by meal type
   static List<SubscriptionPlan> getPlansByMealType(String mealType, String language) {
     return getPlans(language).where((plan) => plan.supportsMealType(mealType)).toList();
   }
 }
 
-// ADD: Simple vendor subscription plans (if you need separate plans for vendors)
 class VendorSubscriptionPlans {
   static const List<SubscriptionPlan> vendorPlans = [
     SubscriptionPlan(
@@ -385,7 +365,7 @@ class VendorSubscriptionPlans {
       icon: Icons.restaurant_menu,
       color: Colors.blue,
       maxMenuItems: 5,
-      mealsPerWeek: 0, // Not applicable for vendor plans
+      mealsPerWeek: 0,
     ),
     SubscriptionPlan(
       id: 'vendor_professional',
@@ -404,7 +384,7 @@ class VendorSubscriptionPlans {
       icon: Icons.star,
       color: Colors.green,
       maxMenuItems: 20,
-      mealsPerWeek: 0, // Not applicable for vendor plans
+      mealsPerWeek: 0,
     ),
     SubscriptionPlan(
       id: 'vendor_enterprise',
@@ -424,7 +404,7 @@ class VendorSubscriptionPlans {
       icon: Icons.diamond,
       color: Colors.purple,
       maxMenuItems: 100,
-      mealsPerWeek: 0, // Not applicable for vendor plans
+      mealsPerWeek: 0,
     ),
   ];
 

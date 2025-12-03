@@ -5,6 +5,7 @@ import 'package:canton_connect/data/models/food_item.dart';
 import 'package:canton_connect/presentation/pages/admin/subscription_management_page.dart';
 import 'package:canton_connect/presentation/widgets/menu/data/menu_data.dart';
 
+
 class SubscriptionPage extends StatefulWidget {
   final String currentLanguage;
   final bool isAdmin;
@@ -12,7 +13,7 @@ class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({
     super.key,
     required this.currentLanguage,
-    this.isAdmin = false,
+    this.isAdmin = false, required bool showAppBar,
   });
 
   @override
@@ -937,7 +938,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
   Widget _buildAddOnCard(AddOnItem addon) {
     final quantity = _selectedAddOns[addon.id] ?? 0;
     
-    return Container(
+    return SizedBox(
       width: 280,
       child: Card(
         elevation: 2,
@@ -1039,7 +1040,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
   Widget _buildDrinkCard(FoodItem drink) {
     final quantity = _selectedDrinks[drink.id] ?? 0;
     
-    return Container(
+    return SizedBox(
       width: 280,
       child: Card(
         elevation: 2,

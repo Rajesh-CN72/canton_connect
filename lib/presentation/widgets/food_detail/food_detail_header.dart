@@ -37,7 +37,7 @@ class FoodDetailHeader extends StatelessWidget {
   }
 
   Widget _buildAppBar(BuildContext context) {
-    Widget _buildIconButton({
+    Widget buildIconButton({
       required Icon icon,
       required VoidCallback onPressed,
       String? tooltip,
@@ -77,7 +77,7 @@ class FoodDetailHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _buildIconButton(
+              buildIconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: onBackPressed,
                 tooltip: 'Back',
@@ -95,14 +95,14 @@ class FoodDetailHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              _buildIconButton(
+              buildIconButton(
                 icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
                 onPressed: onFavoritePressed,
                 tooltip: isFavorite ? 'Remove from favorites' : 'Add to favorites',
                 iconColor: isFavorite ? Colors.red : null,
               ),
               const SizedBox(width: 8),
-              _buildIconButton(
+              buildIconButton(
                 icon: const Icon(Icons.share),
                 onPressed: onSharePressed,
                 tooltip: 'Share',

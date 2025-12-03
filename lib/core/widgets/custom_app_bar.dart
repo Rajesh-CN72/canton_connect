@@ -10,6 +10,7 @@ enum AppBarActionType {
   logout,
   notifications,
   settings,
+  health, // Added health action type
 }
 
 class AppBarAction {
@@ -33,7 +34,6 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<AppBarAction> actions;
   final String currentLanguage;
   final Function(String) onLanguageChanged;
-  final VoidCallback? onSubscriptionPlansTap;
   final VoidCallback? onTitleTap;
   final bool isAdmin;
 
@@ -43,7 +43,6 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.actions,
     required this.currentLanguage,
     required this.onLanguageChanged,
-    this.onSubscriptionPlansTap,
     this.onTitleTap,
     this.isAdmin = false,
   });
@@ -98,33 +97,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
         : AppConstants.sloganEn;
   }
 
+  bool _isMobile(double screenWidth) {
+    return screenWidth < AppConstants.tabletBreakpoint;
+  }
+
+  // Removed unused methods:
+  // bool _isTablet(double screenWidth) { ... }
+  // bool _isDesktop(double screenWidth) { ... }
+
   List<Widget> _buildDesktopActions() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= AppConstants.tabletBreakpoint && 
-                    screenWidth < AppConstants.desktopBreakpoint;
-
     return [
-      // Subscription Plans (Text Button) - only show on desktop and not for admin
-      if (!isTablet && !widget.isAdmin) 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: TextButton(
-            onPressed: widget.onSubscriptionPlansTap ?? () {},
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            ),
-            child: Text(
-              widget.currentLanguage == 'zh' ? '订阅计划' : 'Subscription Plans',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                fontFamily: AppConstants.secondaryFont,
-              ),
-            ),
-          ),
-        ),
-
       // Action buttons
       ...widget.actions.map(_buildActionButton),
     ];
@@ -177,6 +159,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
                         color: Colors.grey,
                       ),
                     ),
+                  ] else if (action.type == AppBarActionType.health) ...[
+                    Icon(
+                      Icons.health_and_safety, 
+                      color: Colors.green.shade400, 
+                      size: 18
+                    ),
+                    const SizedBox(width: 8),
+                    Text(widget.currentLanguage == 'zh' ? '健康理念' : 'Health Concepts'),
                   ] else ...[
                     Icon(
                       action.icon, 
@@ -218,6 +208,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget _buildActionButton(AppBarAction action) {
     final isLanguageButton = action.type == AppBarActionType.language;
     final isLogoutButton = action.type == AppBarActionType.logout;
+    final isHealthButton = action.type == AppBarActionType.health;
     
     if (isLanguageButton) {
       return Container(
@@ -257,9 +248,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
         ),
       );
     } else if (isLogoutButton) {
-      // Special styling for logout button
       return IconButton(
         icon: Icon(action.icon, size: 20, color: Colors.red.shade200),
+        onPressed: action.onPressed,
+        tooltip: action.label,
+        padding: const EdgeInsets.all(4),
+      );
+    } else if (isHealthButton) {
+      return IconButton(
+        icon: Icon(Icons.health_and_safety, size: 20, color: Colors.green.shade300),
         onPressed: action.onPressed,
         tooltip: action.label,
         padding: const EdgeInsets.all(4),
@@ -290,7 +287,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < AppConstants.tabletBreakpoint;
+    final isMobile = _isMobile(screenWidth);
 
     return AppBar(
       backgroundColor: widget.isAdmin 
@@ -338,11 +335,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     ),
                     child: Row(
                       children: [
-                        // Logo
                         _buildLogo(32),
                         const SizedBox(width: 12),
                         
-                        // App Name and Slogan
                         Expanded(
                           child: _buildAppNameAndSlogan(),
                         ),
@@ -444,7 +439,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 }
 
-// Admin-specific App Bar
 class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget>? actions;
@@ -468,30 +462,33 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return AppBar(
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.white,
+          fontSize: screenWidth < AppConstants.tabletBreakpoint ? 16 : 18,
         ),
       ),
       backgroundColor: const Color(0xFF1a237e),
       foregroundColor: Colors.white,
       elevation: 4,
-      // FIXED: Added const keyword to the Color constructor
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.3),
       leading: showBackButton
           ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(
+                Icons.arrow_back, 
+                color: Colors.white,
+                size: screenWidth < AppConstants.tabletBreakpoint ? 24 : 28,
+              ),
               onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
             )
           : null,
       actions: [
-        // Language Switcher for Admin
         _buildLanguageSwitcher(),
-        
-        // Additional actions
         ...?actions,
       ],
     );

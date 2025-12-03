@@ -1,5 +1,0 @@
-﻿# Functions
-/.netlify/functions/* /.netlify/functions/:splat 200
-
-# SPA routing
-/* /index.html 200

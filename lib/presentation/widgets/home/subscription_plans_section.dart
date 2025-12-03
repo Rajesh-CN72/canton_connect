@@ -113,7 +113,7 @@ class SubscriptionPlansSection extends StatelessWidget {
         category: 'young_professionals',
         icon: Icons.business_center,
         color: Colors.green,
-        maxMenuItems: 20, // ADDED: maxMenuItems parameter
+        maxMenuItems: 20,
       ),
       SubscriptionPlan(
         id: 'nutritionist_designed',
@@ -140,7 +140,7 @@ class SubscriptionPlansSection extends StatelessWidget {
         category: 'health',
         icon: Icons.monitor_heart,
         color: Colors.purple,
-        maxMenuItems: 30, // ADDED: maxMenuItems parameter
+        maxMenuItems: 30,
       ),
       SubscriptionPlan(
         id: 'family_feast',
@@ -167,7 +167,7 @@ class SubscriptionPlansSection extends StatelessWidget {
         category: 'family',
         icon: Icons.family_restroom,
         color: Colors.red,
-        maxMenuItems: 25, // ADDED: maxMenuItems parameter
+        maxMenuItems: 25,
       ),
     ];
   }
@@ -225,6 +225,7 @@ class SubscriptionPlansSection extends StatelessWidget {
         builder: (BuildContext context) => SubscriptionPage(
           currentLanguage: currentLanguage,
           isAdmin: isAdmin,
+          showAppBar: true,
         ),
       ),
     );
@@ -245,7 +246,7 @@ class SubscriptionPlansSection extends StatelessWidget {
       ...plans.map((plan) => Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: _buildPlanCard(context, plan, true),
-      )).toList(),
+      )),
     ];
   }
 
@@ -269,7 +270,8 @@ class SubscriptionPlansSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF000000).withValues(alpha: 0.25), // FIXED: withOpacity to withValues
+            // FIXED: Converted to double
+            color: const Color(0xFF000000).withValues(alpha: (0.25 * 255.0).round().clamp(0, 255).toDouble()),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -277,7 +279,8 @@ class SubscriptionPlansSection extends StatelessWidget {
         border: Border.all(
           color: plan.isPopular 
               ? const Color(AppConstants.secondaryColorValue) 
-              : const Color(0xFFE0E0E0).withValues(alpha: 0.2), // FIXED: withOpacity to withValues
+              // FIXED: Converted to double
+              : const Color(0xFFE0E0E0).withValues(alpha: (0.2 * 255.0).round().clamp(0, 255).toDouble()),
           width: plan.isPopular ? 2 : 1,
         ),
       ),

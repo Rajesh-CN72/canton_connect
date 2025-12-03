@@ -8,12 +8,12 @@ class MenuCategoriesSection extends StatefulWidget {
   final List<String> categories;
 
   const MenuCategoriesSection({
-    Key? key,
+    super.key,
     required this.currentLanguage,
     required this.selectedCategory,
     required this.onCategorySelected,
     required this.categories,
-  }) : super(key: key);
+  });
 
   @override
   State<MenuCategoriesSection> createState() => _MenuCategoriesSectionState();

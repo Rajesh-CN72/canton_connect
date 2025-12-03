@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:canton_connect/core/constants/app_constants.dart';
@@ -25,10 +25,8 @@ import 'package:canton_connect/presentation/pages/admin/subscription_management_
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Add error handling for Flutter framework errors
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    // You can also log to your error reporting service here
     debugPrint('Flutter Error: ${details.exception}');
   };
   
@@ -64,7 +62,6 @@ class _MyAppState extends State<MyApp> {
             onGenerateRoute: RouteGenerator.generateRoute,
             navigatorKey: NavigatorKeyHolder.navigatorKey,
             debugShowCheckedModeBanner: false,
-            // Add builder to handle loading and errors
             builder: (context, child) {
               return MediaQuery(
                 data: MediaQuery.of(context).copyWith(
@@ -84,7 +81,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData _buildThemeData(String currentLanguage) {
-    // Determine which font to use based on language
     String defaultFontFamily = currentLanguage == 'zh' ? 'NotoSansSC' : 'Poppins';
     
     return ThemeData(
@@ -179,7 +175,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   Future<void> _initializeApp() async {
     try {
-      // Use WidgetsBinding to ensure this runs after the first frame
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
           await Provider.of<AuthProvider>(context, listen: false).initialize();
@@ -222,7 +217,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     
-    // Show error screen if initialization failed
     if (_hasError) {
       return Scaffold(
         body: Center(
@@ -259,7 +253,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
     
-    // Show loading while initializing
     if (_isInitializing) {
       return Scaffold(
         body: Center(
@@ -278,7 +271,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
     
-    // Show loading while checking auth state (if needed in future)
     if (authProvider.isLoading) {
       return Scaffold(
         body: Center(
@@ -297,7 +289,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
     
-    // TEMPORARY: Bypass login and go directly to MainApp for development
     return const MainApp();
   }
 }
@@ -314,7 +305,6 @@ class _MainAppState extends State<MainApp> {
   final int _cartItemCount = 3;
   bool _isAppBarScrolled = false;
 
-  // Track scroll state for home page
   void _updateAppBarScroll(bool isScrolled) {
     if (mounted) {
       setState(() {
@@ -323,28 +313,35 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
-  // Build pages with scroll callback for home page
+  // Updated pages list with SubscriptionPage as index 4
   List<Widget> get _pages => [
         HomePage(
           onScrollUpdate: _updateAppBarScroll,
         ),
         const MenuPage(),
-        const HealthConceptsPage(),
         const OrderPage(),
         const ProfilePage(),
+        // Subscription page as bottom nav item
+        Consumer<LanguageProvider>(
+          builder: (context, languageProvider, child) {
+            return SubscriptionPage(
+              currentLanguage: languageProvider.currentLanguage,
+              isAdmin: false,
+              showAppBar: false, // Don't show app bar since we have CustomAppBar
+            );
+          },
+        ),
       ];
 
   void _handleBottomNavTap(int index) {
     if (mounted) {
       setState(() {
         _currentBottomNavIndex = index;
-        // Reset scroll state when switching pages
         _isAppBarScrolled = false;
       });
     }
   }
 
-  // Show admin access dialog
   void _showSecretAdminDialog() {
     showDialog(
       context: context,
@@ -422,52 +419,38 @@ class _MainAppState extends State<MainApp> {
     );
   }
 
-  // Navigate to admin panel
   void _navigateToAdminPanel() {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => const AdminLoginPage(),
     ));
   }
 
-  // Navigate to subscription page
-  void _navigateToSubscriptionPage() {
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+  void _onHealthConceptsPressed() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SubscriptionPage(
-          currentLanguage: languageProvider.currentLanguage,
-          isAdmin: false,
-        ),
+        builder: (context) => const HealthConceptsPage(),
       ),
     );
   }
 
-  // Method for cart pressed
   void _onCartPressed() {
     debugPrint('Cart tapped from main app bar');
   }
 
-  // Method for search pressed
   void _onSearchPressed() {
     debugPrint('Search tapped');
   }
 
   void _onProfilePressed() {
     debugPrint('Profile tapped');
-    // Navigate to profile page or show profile menu
     if (mounted) {
       setState(() {
-        _currentBottomNavIndex = 4; // Profile page index
+        _currentBottomNavIndex = 3; // Profile page index
       });
     }
   }
 
-  void _onSubscriptionPlansTap() {
-    debugPrint('Subscription plans tapped');
-    _navigateToSubscriptionPage();
-  }
-
-  // Build app bar actions list
+  // Updated app bar actions: removed subscription, added health concepts
   List<AppBarAction> get _appBarActions {
     return [
       AppBarAction(
@@ -489,18 +472,19 @@ class _MainAppState extends State<MainApp> {
         label: 'Profile',
         onPressed: _onProfilePressed,
       ),
+      // Health Concepts in app bar
       AppBarAction(
-        type: AppBarActionType.subscription,
-        icon: Icons.subscriptions,
-        label: 'Subscription Plans',
-        onPressed: _onSubscriptionPlansTap,
+        type: AppBarActionType.health,
+        icon: Icons.health_and_safety,
+        label: 'Health Concepts',
+        onPressed: _onHealthConceptsPressed,
       ),
       AppBarAction(
         type: AppBarActionType.language,
         icon: Icons.language,
         label: 'Switch Language',
         onPressed: () {
-          // This will be handled by the language button in CustomAppBar
+          // Handled by language button in CustomAppBar
         },
       ),
     ];
@@ -519,8 +503,7 @@ class _MainAppState extends State<MainApp> {
         onLanguageChanged: (newLanguage) {
           languageProvider.setLanguage(Locale(newLanguage));
         },
-        onSubscriptionPlansTap: _onSubscriptionPlansTap,
-        onTitleTap: _showSecretAdminDialog, // Secret admin access
+        onTitleTap: _showSecretAdminDialog,
       ),
       body: Stack(
         children: [
@@ -528,7 +511,7 @@ class _MainAppState extends State<MainApp> {
             index: _currentBottomNavIndex,
             children: _pages,
           ),
-          // TEMPORARY: Admin test button - REMOVE LATER
+          // TEMPORARY: Admin test button
           if (kDebugMode)
             Positioned(
               top: 100,

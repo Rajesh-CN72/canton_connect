@@ -1,8 +1,6 @@
-// lib/data/services/subscription_service.dart
-import 'package:flutter/foundation.dart'; // Add this import for debugPrint
+import 'package:flutter/foundation.dart';
 
-// Define the models here since they don't exist in your project yet
-class SubscriptionPlan {
+class VendorSubscriptionPlan {
   final String id;
   final String name;
   final String description;
@@ -11,7 +9,7 @@ class SubscriptionPlan {
   final List<String> features;
   final bool isPopular;
 
-  const SubscriptionPlan({
+  const VendorSubscriptionPlan({
     required this.id,
     required this.name,
     required this.description,
@@ -22,9 +20,9 @@ class SubscriptionPlan {
   });
 }
 
-class AppSubscriptionPlans {
-  static const List<SubscriptionPlan> plans = [
-    SubscriptionPlan(
+class AppVendorPlans {
+  static const List<VendorSubscriptionPlan> plans = [
+    VendorSubscriptionPlan(
       id: 'basic',
       name: 'Basic',
       description: 'Perfect for home cooks starting out',
@@ -36,7 +34,7 @@ class AppSubscriptionPlans {
         'Customer reviews',
       ],
     ),
-    SubscriptionPlan(
+    VendorSubscriptionPlan(
       id: 'professional',
       name: 'Professional',
       description: 'For serious home cooks',
@@ -50,7 +48,7 @@ class AppSubscriptionPlans {
       ],
       isPopular: true,
     ),
-    SubscriptionPlan(
+    VendorSubscriptionPlan(
       id: 'enterprise',
       name: 'Enterprise',
       description: 'For established food businesses',
@@ -66,12 +64,12 @@ class AppSubscriptionPlans {
     ),
   ];
 
-  static SubscriptionPlan getPlanById(String id) {
+  static VendorSubscriptionPlan getPlanById(String id) {
     return plans.firstWhere((plan) => plan.id == id);
   }
 }
 
-class User {
+class VendorUser {
   final String id;
   final String email;
   final String fullName;
@@ -82,7 +80,7 @@ class User {
   final DateTime? subscriptionExpiry;
   final int menuItemsCount;
 
-  const User({
+  const VendorUser({
     required this.id,
     required this.email,
     required this.fullName,
@@ -104,23 +102,23 @@ class User {
   bool get canAddMoreMenuItems {
     if (!hasActiveSubscription) return false;
     
-    final plan = AppSubscriptionPlans.getPlanById(subscriptionPlanId!);
+    final plan = AppVendorPlans.getPlanById(subscriptionPlanId!);
     return menuItemsCount < plan.maxMenuItems;
   }
 
   int get remainingMenuItems {
     if (!hasActiveSubscription) return 0;
     
-    final plan = AppSubscriptionPlans.getPlanById(subscriptionPlanId!);
+    final plan = AppVendorPlans.getPlanById(subscriptionPlanId!);
     return plan.maxMenuItems - menuItemsCount;
   }
 
-  User copyWith({
+  VendorUser copyWith({
     String? subscriptionPlanId,
     DateTime? subscriptionExpiry,
     int? menuItemsCount,
   }) {
-    return User(
+    return VendorUser(
       id: id,
       email: email,
       fullName: fullName,
@@ -141,20 +139,14 @@ class SubscriptionService {
     required String paymentMethodId,
   }) async {
     try {
-      // 1. Process payment (integrate with Stripe, PayPal, etc.)
       final paymentSuccess = await _processPayment(planId, paymentMethodId);
       
       if (!paymentSuccess) {
         throw Exception('Payment failed');
       }
 
-      // 2. Calculate expiry date (e.g., 30 days from now)
       final expiryDate = DateTime.now().add(const Duration(days: 30));
-
-      // 3. Update user subscription in database
       await _updateUserSubscription(userId, planId, expiryDate);
-
-      // 4. Send confirmation email
       await _sendConfirmationEmail(userId, planId);
       
     } catch (e) {
@@ -176,7 +168,7 @@ class SubscriptionService {
     final user = await _getUser(userId);
     final updatedCount = user.menuItemsCount + 1;
     
-    if (updatedCount > AppSubscriptionPlans.getPlanById(user.subscriptionPlanId!).maxMenuItems) {
+    if (updatedCount > AppVendorPlans.getPlanById(user.subscriptionPlanId!).maxMenuItems) {
       throw Exception('Menu item limit reached for current subscription plan');
     }
 
@@ -185,8 +177,6 @@ class SubscriptionService {
 
   // Private helper methods
   static Future<bool> _processPayment(String planId, String paymentMethodId) async {
-    // Integrate with your payment provider
-    // For now, simulate success
     await Future.delayed(const Duration(seconds: 1));
     return true;
   }
@@ -196,40 +186,29 @@ class SubscriptionService {
     String planId, 
     DateTime expiryDate,
   ) async {
-    // Update user in your database
-    // Implementation depends on your database setup
     debugPrint('Updating user $userId subscription to plan $planId until $expiryDate');
-    // TODO: Implement actual database update
   }
 
-  static Future<User> _getUser(String userId) async {
-    // Fetch user from database
-    // This is a placeholder - implement your actual user fetching logic
-    // For now, return a dummy user for testing
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
+  static Future<VendorUser> _getUser(String userId) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     
-    return User(
+    return VendorUser(
       id: userId,
       email: 'test@example.com',
       fullName: 'Test User',
       role: 'customer',
       createdAt: DateTime.now(),
-      subscriptionPlanId: 'basic', // Default plan
+      subscriptionPlanId: 'basic',
       subscriptionExpiry: DateTime.now().add(const Duration(days: 30)),
       menuItemsCount: 0,
     );
   }
 
   static Future<void> _updateUserMenuItemCount(String userId, int count) async {
-    // Update user in database
-    // Implementation depends on your database setup
     debugPrint('Updating user $userId menu item count to $count');
-    // TODO: Implement actual database update
   }
 
   static Future<void> _sendConfirmationEmail(String userId, String planId) async {
-    // Send email logic
     debugPrint('Sending confirmation email to user $userId for plan $planId');
-    // TODO: Implement actual email service
   }
 }
