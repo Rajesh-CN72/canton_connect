@@ -1,0 +1,11 @@
+﻿# Cloudflare Pages ignore file
+.DS_Store
+Thumbs.db
+.git/
+.gitignore
+*.log
+*.tmp
+*.temp
+build.sh
+package.json
+.cfignore

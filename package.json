@@ -1,11 +1,7 @@
-{
+﻿{
   "name": "canton-connect",
   "version": "1.0.0",
-  "description": "Canton Connect Food Delivery API",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "echo 'Build step handled by netlify.toml'"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+    "build": "bash ./build.sh"
+  }
 }
