@@ -1,40 +1,27 @@
 ﻿#!/bin/bash
-
-# Exit on error
 set -e
 
-echo "========================================"
-echo "Flutter Web Build for Cloudflare Pages"
-echo "========================================"
+echo "🚀 Starting Flutter Web Build..."
 
-# Install Flutter
-FLUTTER_VERSION="3.16.0"
-echo "📦 Installing Flutter $FLUTTER_VERSION..."
-
-# Download and extract Flutter
+# Download Flutter with Dart 3.3.0+
+echo "📦 Downloading Flutter..."
+FLUTTER_VERSION="3.22.0"
 wget -q https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
 tar -xf flutter_linux_${FLUTTER_VERSION}-stable.tar.xz -C /tmp
-
-# Add Flutter to PATH
 export PATH="$PATH:/tmp/flutter/bin"
 
-# Verify Flutter installation
-echo "✅ Flutter installed:"
-flutter --version
-
-# Enable web support
-echo "🔧 Setting up Flutter web..."
+# Setup
+echo "🔧 Setting up environment..."
+flutter config --no-analytics
+flutter config --no-animations
 flutter config --enable-web
 
-# Install dependencies
-echo "📚 Getting dependencies..."
+# Get dependencies
+echo "📚 Installing dependencies..."
 flutter pub get
 
-# Build web app
-echo "🚀 Building web app..."
-flutter build web --release --base-href /
+# Build
+echo "🏗️ Building web app..."
+flutter build web --release --no-tree-shake-icons
 
-echo "========================================"
-echo "✅ Build completed successfully!"
-echo "Output: build/web/"
-echo "========================================"
+echo "✅ Build complete! Output: build/web/"
