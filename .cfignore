@@ -9,3 +9,6 @@ Thumbs.db
 build.sh
 package.json
 .cfignore
+
+# Cache Flutter installation
+/flutter/

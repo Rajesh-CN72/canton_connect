@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 set -e  # Exit immediately if any command fails
 
@@ -15,6 +15,9 @@ flutter --version
 
 echo "🔧 Setting up Flutter web..."
 flutter config --enable-web
+
+echo "🛠️ Creating web files if missing..."
+flutter create . --platforms=web --overwrite
 
 echo "📚 Getting dependencies..."
 flutter pub get
