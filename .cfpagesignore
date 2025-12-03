@@ -1,0 +1,12 @@
+﻿# Ignore for Cloudflare Pages build
+.git/
+.gitignore
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+node_modules/
+build.sh
+package.json
+.cfpagesignore

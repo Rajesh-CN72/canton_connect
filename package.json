@@ -2,6 +2,12 @@
   "name": "canton-connect",
   "version": "1.0.0",
   "scripts": {
-    "build": "bash build.sh"
+    "build": "chmod +x build.sh && ./build.sh",
+    "prebuild": "echo 'Starting build process...'",
+    "postbuild": "echo 'Build completed!'"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
   }
 }
