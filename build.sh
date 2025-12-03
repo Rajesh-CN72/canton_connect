@@ -1,5 +1,7 @@
 ﻿#!/bin/bash
 
+set -e  # Exit immediately if any command fails
+
 echo "========================================"
 echo "Flutter Web Build for Cloudflare Pages"
 echo "========================================"
