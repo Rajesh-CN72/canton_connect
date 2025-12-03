@@ -2,6 +2,6 @@
   "name": "canton-connect",
   "version": "1.0.0",
   "scripts": {
-    "build": "bash ./build.sh"
+    "build": "bash build.sh"
   }
 }
