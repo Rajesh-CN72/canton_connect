@@ -20,7 +20,8 @@ flutter pub get
 echo "🔨 Building web app..."
 flutter build web --release --web-renderer html --no-tree-shake-icons
 
-echo "📦 Copying build output..."
-cp -r build/web/* ../public/
+echo "📦 Copying to public directory..."
+mkdir -p ./public
+cp -r build/web/* ./public/
 
-echo "✅ Build completed successfully!"
+echo "✅ Build completed! Files ready in ./public/"
