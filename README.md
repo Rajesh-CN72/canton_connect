@@ -90,3 +90,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - GitHub: [@Rajesh-CN72](https://github.com/Rajesh-CN72)
 - Project Link: [https://github.com/Rajesh-CN72/canton_connect](https://github.com/Rajesh-CN72/canton_connect)
+
+# Force Cloudflare rebuild at 2025-12-03 17:22:48
+# This ensures fresh deployment with latest fixes
